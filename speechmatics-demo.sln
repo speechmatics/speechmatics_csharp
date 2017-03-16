@@ -1,0 +1,60 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2013 for Windows Desktop
+VisualStudioVersion = 12.0.40629.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Speechmatics.API", "Speechmatics.API\Speechmatics.API.csproj", "{187B2F43-BB01-4DE2-B882-8384EC498CEE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Speechmatics.Transcription", "Speechmatics.Transcription\Speechmatics.Transcription.csproj", "{FF03DA95-1F19-42B1-BCD2-D3EACA5A60E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Speechmatics.Alignment", "Speechmatics.Alignment\Speechmatics.Alignment.csproj", "{4A23139B-BD03-4EF3-B409-0267C5A935F9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{187B2F43-BB01-4DE2-B882-8384EC498CEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{187B2F43-BB01-4DE2-B882-8384EC498CEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{187B2F43-BB01-4DE2-B882-8384EC498CEE}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{187B2F43-BB01-4DE2-B882-8384EC498CEE}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{187B2F43-BB01-4DE2-B882-8384EC498CEE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{187B2F43-BB01-4DE2-B882-8384EC498CEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{187B2F43-BB01-4DE2-B882-8384EC498CEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{187B2F43-BB01-4DE2-B882-8384EC498CEE}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{187B2F43-BB01-4DE2-B882-8384EC498CEE}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{187B2F43-BB01-4DE2-B882-8384EC498CEE}.Release|x86.ActiveCfg = Release|Any CPU
+		{FF03DA95-1F19-42B1-BCD2-D3EACA5A60E8}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{FF03DA95-1F19-42B1-BCD2-D3EACA5A60E8}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{FF03DA95-1F19-42B1-BCD2-D3EACA5A60E8}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{FF03DA95-1F19-42B1-BCD2-D3EACA5A60E8}.Debug|x86.ActiveCfg = Debug|x86
+		{FF03DA95-1F19-42B1-BCD2-D3EACA5A60E8}.Debug|x86.Build.0 = Debug|x86
+		{FF03DA95-1F19-42B1-BCD2-D3EACA5A60E8}.Release|Any CPU.ActiveCfg = Release|x86
+		{FF03DA95-1F19-42B1-BCD2-D3EACA5A60E8}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{FF03DA95-1F19-42B1-BCD2-D3EACA5A60E8}.Release|Mixed Platforms.Build.0 = Release|x86
+		{FF03DA95-1F19-42B1-BCD2-D3EACA5A60E8}.Release|x86.ActiveCfg = Release|x86
+		{FF03DA95-1F19-42B1-BCD2-D3EACA5A60E8}.Release|x86.Build.0 = Release|x86
+		{4A23139B-BD03-4EF3-B409-0267C5A935F9}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{4A23139B-BD03-4EF3-B409-0267C5A935F9}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{4A23139B-BD03-4EF3-B409-0267C5A935F9}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{4A23139B-BD03-4EF3-B409-0267C5A935F9}.Debug|x86.ActiveCfg = Debug|x86
+		{4A23139B-BD03-4EF3-B409-0267C5A935F9}.Debug|x86.Build.0 = Debug|x86
+		{4A23139B-BD03-4EF3-B409-0267C5A935F9}.Release|Any CPU.ActiveCfg = Release|x86
+		{4A23139B-BD03-4EF3-B409-0267C5A935F9}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{4A23139B-BD03-4EF3-B409-0267C5A935F9}.Release|Mixed Platforms.Build.0 = Release|x86
+		{4A23139B-BD03-4EF3-B409-0267C5A935F9}.Release|x86.ActiveCfg = Release|x86
+		{4A23139B-BD03-4EF3-B409-0267C5A935F9}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
+	EndGlobalSection
+EndGlobal
