@@ -1,10 +1,9 @@
 ﻿using System;
-using System.IO;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
-using System.Text;
+using System.IO;
 using System.Net;
+using System.Text;
 
 namespace Speechmatics.API
 {

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Speechmatics.API
+﻿namespace Speechmatics.API
 {
     /// <summary>
     /// Response from uploading a new audio file to the API for transcription

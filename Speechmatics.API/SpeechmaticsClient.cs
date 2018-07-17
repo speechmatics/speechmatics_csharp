@@ -1,11 +1,8 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.IO;
 using System.Net;
-using System.Collections.Specialized;
-using System.Runtime.Serialization;
-
 using Newtonsoft.Json;
-
 
 namespace Speechmatics.API
 {
@@ -23,8 +20,8 @@ namespace Speechmatics.API
         {
             _wc = new WebClient();
             _baseUri = new Uri("https://api.speechmatics.com/v1.0");
-            this._userId = userId;
-            this._authToken = authToken;
+            _userId = userId;
+            _authToken = authToken;
         }
 
         /// <summary>
@@ -39,29 +36,28 @@ namespace Speechmatics.API
             {
                 return new User((int)userJson.user.id, (string)userJson.user.email, (int)userJson.user.balance); ;
             }
-            else { return null; }
+            return null;
         }
 
         /// <summary>
         /// Uploads the given audio file to the speechmatics API for transcription
         /// </summary>
         /// <param name="audioFilename">Full path to audio file</param>
+        /// <param name="lang"></param>
+        /// <param name="diarize"></param>
         /// <returns>Response object or null if an error occurs</returns>
-        public CreateJobResponse CreateTranscriptionJob(string audioFilename, string lang, bool diarise)
+        public CreateJobResponse CreateTranscriptionJob(string audioFilename, string lang, bool diarize)
         {
             var uploadUri = CreateUserRelativeUri("/jobs/");
             using (var fileStream = new FileStream(audioFilename, FileMode.Open))
             {
-                var jsonResponse = FileUpload.UploadFileForTranscription(uploadUri, Path.GetFileName(audioFilename), fileStream, lang, new NameValueCollection(), diarise);
+                var jsonResponse = FileUpload.UploadFileForTranscription(uploadUri, Path.GetFileName(audioFilename), fileStream, lang, new NameValueCollection(), diarize);
                 if (jsonResponse != null)
                 {
                     dynamic jobJson = JsonConvert.DeserializeObject(jsonResponse);
                     return new CreateJobResponse((int)jobJson.id, (int)jobJson.cost, (int)jobJson.balance);
                 }
-                else
-                {
-                    return null;
-                }
+                return null;
             }
         }
 
@@ -71,23 +67,20 @@ namespace Speechmatics.API
         /// <param name="audioFilename">Full path to audio file</param>
         /// <param name="textFilename">Full path to text file</param>
         /// <returns>Response object or null if an error occurs</returns>
-        public CreateJobResponse CreateAlignmentJob(string audioFilename, string textFileName, string lang)
+        public CreateJobResponse CreateAlignmentJob(string audioFilename, string textFilename, string lang)
         {
             var uploadUri = CreateUserRelativeUri("/jobs/");
             using (var fileStream = new FileStream(audioFilename, FileMode.Open))
             {
-                using (var fileStream2 = new FileStream(textFileName, FileMode.Open))
+                using (var fileStream2 = new FileStream(textFilename, FileMode.Open))
                 {
-                    var jsonResponse = FileUpload.UploadFilesForAlignment(uploadUri, Path.GetFileName(audioFilename), fileStream, Path.GetFileName(textFileName), fileStream2, lang, new NameValueCollection());
+                    var jsonResponse = FileUpload.UploadFilesForAlignment(uploadUri, Path.GetFileName(audioFilename), fileStream, Path.GetFileName(textFilename), fileStream2, lang, new NameValueCollection());
                     if (jsonResponse != null)
                     {
                         dynamic jobJson = JsonConvert.DeserializeObject(jsonResponse);
                         return new CreateJobResponse((int)jobJson.id, (int)jobJson.cost, (int)jobJson.balance);
                     }
-                    else
-                    {
-                        return null;
-                    }
+                    return null;
                 }
             }
         }
@@ -107,16 +100,14 @@ namespace Speechmatics.API
                 job.Status = jobJson.job.job_status;
                 return job;
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
 
         /// <summary>
         /// Get the transcript in text format for the given Job (which should have a status of 'processed')
         /// </summary>
         /// <param name="job">Job to get transcript of</param>
+        /// <param name="format"></param>
         /// <returns>Transcript in text format or null if an error occurs</returns>
         public String GetTranscript(Job job, string format)
         {
@@ -133,6 +124,7 @@ namespace Speechmatics.API
         /// Get the alignment for the given Job (which should have a status of 'processed')
         /// </summary>
         /// <param name="job">Job to get alignment of</param>
+        /// <param name="onePerLine"></param>
         /// <returns>Alignment text or null if an error occurs</returns>
         public String GetAlignment(Job job, bool onePerLine)
         {
@@ -159,7 +151,7 @@ namespace Speechmatics.API
             foreach (string name in requestParams.Keys){
                 paramString += name+"="+requestParams[name]+"&";
             }
-            return new Uri(_baseUri, $"/v1.0/user/{_userId.ToString()}{path}{paramString}");
+            return new Uri(_baseUri, $"/v1.0/user/{_userId}{path}{paramString}");
         }
 
         private string GetString(Uri uri)

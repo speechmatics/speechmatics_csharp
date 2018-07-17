@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Speechmatics.API
+﻿namespace Speechmatics.API
 {
     /// <summary>
     /// Class describing a single transcription job uniquely identified by Id

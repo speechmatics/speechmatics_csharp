@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
 using System.IO;
+using System.Windows.Forms;
 using Speechmatics.API;
 
 namespace Speechmatics.Transcription
@@ -26,7 +21,7 @@ namespace Speechmatics.Transcription
             var dr = ofdUploadFile.ShowDialog();
             if (dr == DialogResult.OK)
             {
-                this.Cursor = Cursors.WaitCursor;
+                Cursor = Cursors.WaitCursor;
                 try
                 {
                     _files = new string[1];
@@ -38,7 +33,7 @@ namespace Speechmatics.Transcription
                 }
                 finally
                 {
-                    this.Cursor = Cursors.Default;
+                    Cursor = Cursors.Default;
                 }
             }
         }
@@ -48,7 +43,7 @@ namespace Speechmatics.Transcription
             var dr = fbdUploadDir.ShowDialog();
             if (dr == DialogResult.OK)
             {
-                this.Cursor = Cursors.WaitCursor;
+                Cursor = Cursors.WaitCursor;
                 try
                 {
                     _files = Directory.GetFiles(fbdUploadDir.SelectedPath);
@@ -59,7 +54,7 @@ namespace Speechmatics.Transcription
                 }
                 finally
                 {
-                    this.Cursor = Cursors.Default;
+                    Cursor = Cursors.Default;
                 }
             }
 
@@ -72,7 +67,7 @@ namespace Speechmatics.Transcription
             cbxDiarise.Enabled = false;
             rtbTranscript.Text = "Your job(s) are currently being transcribed.\r\nPlease wait - when finished your transcription(s) will automatically be displayed here.\n";
             lblJobStatus.Text = "Job status: in progress.";
-            lblJobStatus.ForeColor = System.Drawing.Color.Teal;
+            lblJobStatus.ForeColor = Color.Teal;
             for(var i=0; i < _files.Length ; i++)
             {
                 var resp = _sc.CreateTranscriptionJob(_files[i], langComboBox.Text, cbxDiarise.Checked);
@@ -108,10 +103,10 @@ namespace Speechmatics.Transcription
                 {
                     _sc = new SpeechmaticsClient(userId, tbAuthToken.Text);
                     connectStatusLabel.Text = "Connection status: Not Connected";
-                    this.connectStatusLabel.ForeColor = System.Drawing.Color.DarkOrange;
+                    connectStatusLabel.ForeColor = Color.DarkOrange;
                     gbJob.Enabled = false;  
                     User user = null;
-                    this.Cursor = Cursors.WaitCursor;
+                    Cursor = Cursors.WaitCursor;
                     try
                     {
                         user = _sc.GetUser();
@@ -122,7 +117,7 @@ namespace Speechmatics.Transcription
                     }
                     finally
                     {
-                        this.Cursor = Cursors.Default;
+                        Cursor = Cursors.Default;
                     }
                     if (null == user)
                     {
@@ -136,7 +131,7 @@ namespace Speechmatics.Transcription
                         connectStatusLabel.Text = "Connection status: Connected";
                         lblBalanceValue.Text = FormatBalance(user.Balance);
                         lblEmailValue.Text = user.Email;
-                        connectStatusLabel.ForeColor = System.Drawing.Color.Green;
+                        connectStatusLabel.ForeColor = Color.Green;
                     }
                 }
                 else
@@ -161,10 +156,10 @@ namespace Speechmatics.Transcription
                     if (_jobs[i].Status == "done")
                     {
                         _outputs[i] = _sc.GetTranscript(_jobs[i], "txt");
-                        var sw = new System.IO.StreamWriter(Path.ChangeExtension(_files[i], ".txt"));
+                        var sw = new StreamWriter(Path.ChangeExtension(_files[i], ".txt"));
                         sw.Write(_outputs[i]);
                         sw.Close();
-                        sw = new System.IO.StreamWriter(Path.ChangeExtension(_files[i], ".json"));
+                        sw = new StreamWriter(Path.ChangeExtension(_files[i], ".json"));
                         sw.Write(_sc.GetTranscript(_jobs[i], "json"));
                         sw.Close();
                     }
@@ -183,7 +178,7 @@ namespace Speechmatics.Transcription
             {
                 UnlockClient();
                 lblJobStatus.Text = "Job status: All jobs complete.";
-                lblJobStatus.ForeColor = System.Drawing.Color.Green;
+                lblJobStatus.ForeColor = Color.Green;
             }
 
         }
