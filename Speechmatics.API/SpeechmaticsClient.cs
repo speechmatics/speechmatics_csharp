@@ -154,7 +154,7 @@ namespace Speechmatics.API
             return new Uri(_baseUri, $"/v1.0/user/{_userId}{path}{paramString}");
         }
 
-        private string GetString(Uri uri)
+        private static string GetString(Uri uri)
         {
             try
             {

@@ -89,7 +89,7 @@ namespace Speechmatics.Transcription
 
         }
 
-        private bool IsAudio(string filename)
+        private static bool IsAudio(string filename)
         {
             var ext = Path.GetExtension(filename);
             var allowedExt = new String[5] { ".wav", ".mp3", ".mp4", ".wma", ".ogg" };
@@ -262,7 +262,7 @@ namespace Speechmatics.Transcription
             tmrStatus.Enabled = false;
         }
 
-        private string FormatBalance(int balance)
+        private static string FormatBalance(int balance)
         {
             return $"{balance} credits";
         }

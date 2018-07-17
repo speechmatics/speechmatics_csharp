@@ -192,7 +192,7 @@ namespace Speechmatics.Transcription
             cbxDiarise.Enabled = true;
         }
 
-        private string FormatBalance(int balance)
+        private static string FormatBalance(int balance)
         {
             return $"{balance} credits";
         }
