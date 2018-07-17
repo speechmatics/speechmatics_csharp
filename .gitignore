@@ -1,0 +1,8 @@
+Speechmatics.Alignment/bin/**
+Speechmatics.API/bin/**
+Speechmatics.Transcription/bin/**
+Speechmatics.Alignment/obj/**
+Speechmatics.API/obj/**
+Speechmatics.Transcription/obj/**
+packages/
+.vs/
