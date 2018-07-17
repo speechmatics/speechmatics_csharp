@@ -23,15 +23,15 @@ namespace Speechmatics.Transcription
         private void btnUploadFile_MouseClick(object sender, MouseEventArgs e)
         {
             ofdUploadFile.Title = "Select audio file to be aligned";
-            DialogResult drAudio = ofdUploadFile.ShowDialog();
+            var drAudio = ofdUploadFile.ShowDialog();
             if (drAudio == DialogResult.OK)
             {
-                string audioFilePath = Path.GetFullPath(ofdUploadFile.FileName);
+                var audioFilePath = Path.GetFullPath(ofdUploadFile.FileName);
                 ofdUploadFile.Title = "Select text file to be aligned";
-                DialogResult drText = ofdUploadFile.ShowDialog();
+                var drText = ofdUploadFile.ShowDialog();
                 if (drAudio == DialogResult.OK)
                 {
-                    string textFilePath = Path.GetFullPath(ofdUploadFile.FileName);
+                    var textFilePath = Path.GetFullPath(ofdUploadFile.FileName);
                     audio_files = new string[1];
                     text_files = new string[1];
                     jobs = new Job[1];
@@ -54,15 +54,15 @@ namespace Speechmatics.Transcription
 
         private void btnUploadDir_MouseClick(object sender, MouseEventArgs e)
         {
-            DialogResult dr = fbdUploadDir.ShowDialog();
+            var dr = fbdUploadDir.ShowDialog();
             if (dr == DialogResult.OK)
             {
                 this.Cursor = Cursors.WaitCursor;
                 try
                 {
                     files = Directory.GetFiles(fbdUploadDir.SelectedPath);
-                    int audio_count = 0;
-                    for (int i = 0; i < files.Length; i++ )
+                    var audio_count = 0;
+                    for (var i = 0; i < files.Length; i++ )
                     {
                         if (isAudio(files[i]) && getText(files[i]) != null)
                         {
@@ -72,7 +72,7 @@ namespace Speechmatics.Transcription
                     audio_files = new string[audio_count];
                     text_files = new string[audio_count];
                     audio_count = 0;
-                    for (int i = 0; i < files.Length; i++)
+                    for (var i = 0; i < files.Length; i++)
                     {
                         if (isAudio(files[i]) && getText(files[i]) != null)
                         {
@@ -96,9 +96,9 @@ namespace Speechmatics.Transcription
 
         private bool isAudio(string filename)
         {
-            string ext = Path.GetExtension(filename);
-            string[] allowedExt = new String[5] { ".wav", ".mp3", ".mp4", ".wma", ".ogg" };
-            for (int j=0; j<allowedExt.Length; j++)
+            var ext = Path.GetExtension(filename);
+            var allowedExt = new String[5] { ".wav", ".mp3", ".mp4", ".wma", ".ogg" };
+            for (var j=0; j<allowedExt.Length; j++)
             {
                 if(ext.Equals(allowedExt[j], StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -110,8 +110,8 @@ namespace Speechmatics.Transcription
 
         private string getText(string filename)
         {
-            string basename = Path.GetFileNameWithoutExtension(filename);
-            for (int i=0;i<files.Length;i++)
+            var basename = Path.GetFileNameWithoutExtension(filename);
+            for (var i=0;i<files.Length;i++)
             {
                 if((! files[i].Equals(filename)) && (basename.Equals(Path.GetFileNameWithoutExtension(files[i]))))
                 {
@@ -130,7 +130,7 @@ namespace Speechmatics.Transcription
             rtbOutput.Text = "Your job is currently being aligned.\r\nPlease wait - when it is finished your alignment(s) will automatically be displayed here.\n";
             lblJobStatus.Text = "Job status: in progress.";
             lblJobStatus.ForeColor = System.Drawing.Color.Teal;
-            for (int i = 0; i < audio_files.Length; i++)
+            for (var i = 0; i < audio_files.Length; i++)
             {
                 if (audio_files[i].Equals(text_files[i]))
                 {
@@ -142,7 +142,7 @@ namespace Speechmatics.Transcription
                 }
                 else
                 {
-                    CreateJobResponse resp = sc.CreateAlignmentJob(audio_files[i], text_files[i], langComboBox.Text);
+                    var resp = sc.CreateAlignmentJob(audio_files[i], text_files[i], langComboBox.Text);
                     if (resp != null)
                     {
                         jobs[i] = resp.Job;
@@ -173,7 +173,7 @@ namespace Speechmatics.Transcription
         {
             if (!string.IsNullOrEmpty(tbUserId.Text) && !string.IsNullOrEmpty(tbAuthToken.Text))
             {
-                int userId = -1;
+                var userId = -1;
                 if (Int32.TryParse(tbUserId.Text, out userId))
                 {
                     sc = new SpeechmaticsClient(userId, tbAuthToken.Text);
@@ -222,8 +222,8 @@ namespace Speechmatics.Transcription
         private void checkCurrentJobs()
         {
             rtbOutput.Text = "";
-            int completeCount = 0;
-            for (int i = 0; i < jobs.Length; i++)
+            var completeCount = 0;
+            for (var i = 0; i < jobs.Length; i++)
             {
                 if (jobs[i].Status != "done")
                 {
@@ -231,8 +231,8 @@ namespace Speechmatics.Transcription
                     if (jobs[i].Status == "done")
                     {
                         outputs[i] = sc.getAlignment(jobs[i], true);
-                        string ext = Path.GetExtension(text_files[i]);
-                        System.IO.StreamWriter sw = new System.IO.StreamWriter(Path.ChangeExtension(text_files[i], "word-timings" + ext));
+                        var ext = Path.GetExtension(text_files[i]);
+                        var sw = new System.IO.StreamWriter(Path.ChangeExtension(text_files[i], "word-timings" + ext));
                         sw.Write(sc.getAlignment(jobs[i], false));
                         sw.Close();
                         sw = new System.IO.StreamWriter(Path.ChangeExtension(audio_files[i], "line-timings" + ext));

@@ -23,9 +23,9 @@ namespace Speechmatics.API
         /// <returns>String response from server or null if an error occurs</returns>
         public static String UploadFileForTranscription(Uri uploadUri, string filename, Stream fileStream, string lang, NameValueCollection values, bool diarise)
         {
-            WebRequest request = WebRequest.Create(uploadUri);
+            var request = WebRequest.Create(uploadUri);
             request.Method = "POST";
-            String boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x", NumberFormatInfo.InvariantInfo);
+            var boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x", NumberFormatInfo.InvariantInfo);
             request.ContentType = "multipart/form-data; boundary=" + boundary;
             boundary = "--" + boundary;
 
@@ -79,9 +79,9 @@ namespace Speechmatics.API
             }
             try
             {
-                using (WebResponse response = request.GetResponse())
-                using (Stream responseStream = response.GetResponseStream())
-                using (MemoryStream stream = new MemoryStream())
+                using (var response = request.GetResponse())
+                using (var responseStream = response.GetResponseStream())
+                using (var stream = new MemoryStream())
                 {
                     responseStream.CopyTo(stream);
                     return Encoding.UTF8.GetString(stream.ToArray());
@@ -103,9 +103,9 @@ namespace Speechmatics.API
         /// <returns>String response from server or null if an error occurs</returns>
         public static String UploadFilesForAlignment(Uri uploadUri, string filename, Stream fileStream, string filename2, Stream fileStream2, string lang, NameValueCollection values)
         {
-            WebRequest request = WebRequest.Create(uploadUri);
+            var request = WebRequest.Create(uploadUri);
             request.Method = "POST";
-            String boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x", NumberFormatInfo.InvariantInfo);
+            var boundary = "---------------------------" + DateTime.Now.Ticks.ToString("x", NumberFormatInfo.InvariantInfo);
             request.ContentType = "multipart/form-data; boundary=" + boundary;
             boundary = "--" + boundary;
 
@@ -162,9 +162,9 @@ namespace Speechmatics.API
             }
             try
             {
-                using (WebResponse response = request.GetResponse())
-                using (Stream responseStream = response.GetResponseStream())
-                using (MemoryStream stream = new MemoryStream())
+                using (var response = request.GetResponse())
+                using (var responseStream = response.GetResponseStream())
+                using (var stream = new MemoryStream())
                 {
                     responseStream.CopyTo(stream);
                     return Encoding.UTF8.GetString(stream.ToArray());

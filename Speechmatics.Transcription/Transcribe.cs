@@ -23,7 +23,7 @@ namespace Speechmatics.Transcription
         private void btnUploadFile_MouseClick(object sender, MouseEventArgs e)
         {
             ofdUploadFile.Title = "Select audio file to be transcribed";
-            DialogResult dr = ofdUploadFile.ShowDialog();
+            var dr = ofdUploadFile.ShowDialog();
             if (dr == DialogResult.OK)
             {
                 this.Cursor = Cursors.WaitCursor;
@@ -45,7 +45,7 @@ namespace Speechmatics.Transcription
 
         private void btnUploadDirectory_MouseClick(object sender, MouseEventArgs e)
         {
-            DialogResult dr = fbdUploadDir.ShowDialog();
+            var dr = fbdUploadDir.ShowDialog();
             if (dr == DialogResult.OK)
             {
                 this.Cursor = Cursors.WaitCursor;
@@ -73,9 +73,9 @@ namespace Speechmatics.Transcription
             rtbTranscript.Text = "Your job(s) are currently being transcribed.\r\nPlease wait - when finished your transcription(s) will automatically be displayed here.\n";
             lblJobStatus.Text = "Job status: in progress.";
             lblJobStatus.ForeColor = System.Drawing.Color.Teal;
-            for(int i=0; i < files.Length ; i++)
+            for(var i=0; i < files.Length ; i++)
             {
-                CreateJobResponse resp = sc.CreateTranscriptionJob(files[i], langComboBox.Text, cbxDiarise.Checked);
+                var resp = sc.CreateTranscriptionJob(files[i], langComboBox.Text, cbxDiarise.Checked);
                 if (resp != null)
                 {                       
                     jobs[i] = resp.Job;                       
@@ -103,7 +103,7 @@ namespace Speechmatics.Transcription
         {
             if (!string.IsNullOrEmpty(tbUserId.Text) && !string.IsNullOrEmpty(tbAuthToken.Text))
             {
-                int userId = -1;
+                var userId = -1;
                 if (Int32.TryParse(tbUserId.Text, out userId))
                 {
                     sc = new SpeechmaticsClient(userId, tbAuthToken.Text);
@@ -152,8 +152,8 @@ namespace Speechmatics.Transcription
         private void checkCurrentJobs()
         {
             rtbTranscript.Text = "";
-            int completeCount = 0;
-            for (int i = 0; i < jobs.Length; i++)
+            var completeCount = 0;
+            for (var i = 0; i < jobs.Length; i++)
             {               
                 if (jobs[i].Status != "done")
                 { 
@@ -161,7 +161,7 @@ namespace Speechmatics.Transcription
                     if (jobs[i].Status == "done")
                     {
                         outputs[i] = sc.getTranscript(jobs[i], "txt");
-                        System.IO.StreamWriter sw = new System.IO.StreamWriter(Path.ChangeExtension(files[i], ".txt"));
+                        var sw = new System.IO.StreamWriter(Path.ChangeExtension(files[i], ".txt"));
                         sw.Write(outputs[i]);
                         sw.Close();
                         sw = new System.IO.StreamWriter(Path.ChangeExtension(files[i], ".json"));

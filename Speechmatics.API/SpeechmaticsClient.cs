@@ -33,8 +33,8 @@ namespace Speechmatics.API
         /// <returns>User object containing account details or null if an error occurs</returns>
         public User GetUser()
         {
-            Uri userUri = createUserRelativeUri("/");
-            dynamic userJson = getJson(userUri);
+            var userUri = createUserRelativeUri("/");
+            var userJson = getJson(userUri);
             if (userJson != null)
             {
                 return new User((int)userJson.user.id, (string)userJson.user.email, (int)userJson.user.balance); ;
@@ -49,10 +49,10 @@ namespace Speechmatics.API
         /// <returns>Response object or null if an error occurs</returns>
         public CreateJobResponse CreateTranscriptionJob(string audioFilename, string lang, bool diarise)
         {
-            Uri uploadUri = createUserRelativeUri("/jobs/");
-            using (FileStream fileStream = new FileStream(audioFilename, FileMode.Open))
+            var uploadUri = createUserRelativeUri("/jobs/");
+            using (var fileStream = new FileStream(audioFilename, FileMode.Open))
             {
-                string jsonResponse = FileUpload.UploadFileForTranscription(uploadUri, Path.GetFileName(audioFilename), fileStream, lang, new NameValueCollection(), diarise);
+                var jsonResponse = FileUpload.UploadFileForTranscription(uploadUri, Path.GetFileName(audioFilename), fileStream, lang, new NameValueCollection(), diarise);
                 if (jsonResponse != null)
                 {
                     dynamic jobJson = JsonConvert.DeserializeObject(jsonResponse);
@@ -73,12 +73,12 @@ namespace Speechmatics.API
         /// <returns>Response object or null if an error occurs</returns>
         public CreateJobResponse CreateAlignmentJob(string audioFilename, string textFileName, string lang)
         {
-            Uri uploadUri = createUserRelativeUri("/jobs/");
-            using (FileStream fileStream = new FileStream(audioFilename, FileMode.Open))
+            var uploadUri = createUserRelativeUri("/jobs/");
+            using (var fileStream = new FileStream(audioFilename, FileMode.Open))
             {
-                using (FileStream fileStream2 = new FileStream(textFileName, FileMode.Open))
+                using (var fileStream2 = new FileStream(textFileName, FileMode.Open))
                 {
-                    string jsonResponse = FileUpload.UploadFilesForAlignment(uploadUri, Path.GetFileName(audioFilename), fileStream, Path.GetFileName(textFileName), fileStream2, lang, new NameValueCollection());
+                    var jsonResponse = FileUpload.UploadFilesForAlignment(uploadUri, Path.GetFileName(audioFilename), fileStream, Path.GetFileName(textFileName), fileStream2, lang, new NameValueCollection());
                     if (jsonResponse != null)
                     {
                         dynamic jobJson = JsonConvert.DeserializeObject(jsonResponse);
@@ -99,8 +99,8 @@ namespace Speechmatics.API
         /// <returns>Job object or null if an error occurs</returns>
         public Job UpdateJobStatus(Job job)
         {
-            Uri uploadUri = createUserRelativeUri($"/jobs/{job.Id}/");
-            dynamic jobJson = getJson(uploadUri);
+            var uploadUri = createUserRelativeUri($"/jobs/{job.Id}/");
+            var jobJson = getJson(uploadUri);
             if (jobJson != null)
             {
                 job.Name = jobJson.job.name;
@@ -120,9 +120,9 @@ namespace Speechmatics.API
         /// <returns>Transcript in text format or null if an error occurs</returns>
         public String getTranscript(Job job, string format)
         {
-            NameValueCollection reqParams = new NameValueCollection();
+            var reqParams = new NameValueCollection();
             reqParams.Add("format", format);
-            Uri uploadUri = createUserRelativeUri($"/jobs/{job.Id}/transcript", reqParams);
+            var uploadUri = createUserRelativeUri($"/jobs/{job.Id}/transcript", reqParams);
              
             return getString(uploadUri);
         }
@@ -134,12 +134,12 @@ namespace Speechmatics.API
         /// <returns>Alignment text or null if an error occurs</returns>
         public String getAlignment(Job job, bool onePerLine)
         {
-            NameValueCollection reqParams = new NameValueCollection();
+            var reqParams = new NameValueCollection();
             if (onePerLine)
             {
                 reqParams.Add("tags", "one_per_line");
             }           
-            Uri uploadUri = createUserRelativeUri($"/jobs/{job.Id}/alignment", reqParams);
+            var uploadUri = createUserRelativeUri($"/jobs/{job.Id}/alignment", reqParams);
 
             return getString(uploadUri);
         }
@@ -153,7 +153,7 @@ namespace Speechmatics.API
                 requestParams = new NameValueCollection();
             }
             requestParams.Add("auth_token", authToken);
-            String paramString = "?";
+            var paramString = "?";
             foreach (string name in requestParams.Keys){
                 paramString += name+"="+requestParams[name]+"&";
             }
@@ -164,10 +164,10 @@ namespace Speechmatics.API
         {
             try
             {
-                WebRequest request = WebRequest.Create(uri);
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                var request = WebRequest.Create(uri);
+                var response = (HttpWebResponse)request.GetResponse();
 
-                using (StreamReader sr = new StreamReader(response.GetResponseStream()))
+                using (var sr = new StreamReader(response.GetResponseStream()))
                 {
                     return sr.ReadToEnd();
                 }
@@ -179,7 +179,7 @@ namespace Speechmatics.API
         }
         private dynamic getJson(Uri uri)
         {
-            string resp = getString(uri);
+            var resp = getString(uri);
             return resp == null ? null : JsonConvert.DeserializeObject(resp);
         }
 
