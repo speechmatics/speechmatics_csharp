@@ -23,14 +23,14 @@ namespace Speechmatics.API
         /// <summary>
         /// Unique user Id
         /// </summary>
-        public int Id { get; private set; }
+        public int Id { get; }
         /// <summary>
         /// User's email address
         /// </summary>
-        public string Email { get; private set; }
+        public string Email { get; }
         /// <summary>
         /// User's remaining balance (in pence)
         /// </summary>
-        public int Balance { get; private set;}
+        public int Balance { get; }
     }
 }

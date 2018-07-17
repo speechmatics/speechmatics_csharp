@@ -18,7 +18,6 @@ namespace Speechmatics.API
         /// <param name="authToken">Authentication token obtained from https://app.speechmatics.com/account/ </param>
         public SpeechmaticsClient(int userId, string authToken)
         {
-            _wc = new WebClient();
             _baseUri = new Uri("https://api.speechmatics.com/v1.0");
             _userId = userId;
             _authToken = authToken;
@@ -34,7 +33,7 @@ namespace Speechmatics.API
             var userJson = GetJson(userUri);
             if (userJson != null)
             {
-                return new User((int)userJson.user.id, (string)userJson.user.email, (int)userJson.user.balance); ;
+                return new User((int)userJson.user.id, (string)userJson.user.email, (int)userJson.user.balance);
             }
             return null;
         }
@@ -66,6 +65,7 @@ namespace Speechmatics.API
         /// </summary>
         /// <param name="audioFilename">Full path to audio file</param>
         /// <param name="textFilename">Full path to text file</param>
+        /// <param name="lang"></param>
         /// <returns>Response object or null if an error occurs</returns>
         public CreateJobResponse CreateAlignmentJob(string audioFilename, string textFilename, string lang)
         {
@@ -181,10 +181,9 @@ namespace Speechmatics.API
 
         #region Private Members
 
-        private WebClient _wc;
-        private Uri _baseUri;
-        private int _userId;
-        private string _authToken;
+        private readonly Uri _baseUri;
+        private readonly int _userId;
+        private readonly string _authToken;
 
         #endregion
     }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace Speechmatics.Transcription
+namespace Speechmatics.Alignment
 {
     static class Program
     {

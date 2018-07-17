@@ -19,7 +19,7 @@
         /// <summary>
         /// The new job created by this action
         /// </summary>
-        public Job Job { get; private set; }
+        public Job Job { get; }
         /// <summary>
         /// User's remaining balance (in pence)
         /// </summary>

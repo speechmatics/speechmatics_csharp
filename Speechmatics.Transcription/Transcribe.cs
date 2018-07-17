@@ -77,9 +77,11 @@ namespace Speechmatics.Transcription
                 }
                 else
                 {
-                    _jobs[i] = new Job(0, 0);
-                    _jobs[i].Status = "done";
-                    _jobs[i].Name = _files[i];
+                    _jobs[i] = new Job(0, 0)
+                    {
+                        Status = "done",
+                        Name = _files[i]
+                    };
                     rtbTranscript.Text += "Error uploading file " + _files[i] + "\n";
                     _outputs[i] = "Error uploading file " + _files[i] + "\n";
                 }
@@ -98,14 +100,13 @@ namespace Speechmatics.Transcription
         {
             if (!string.IsNullOrEmpty(tbUserId.Text) && !string.IsNullOrEmpty(tbAuthToken.Text))
             {
-                var userId = -1;
-                if (Int32.TryParse(tbUserId.Text, out userId))
+                if (Int32.TryParse(tbUserId.Text, out var userId))
                 {
                     _sc = new SpeechmaticsClient(userId, tbAuthToken.Text);
                     connectStatusLabel.Text = "Connection status: Not Connected";
                     connectStatusLabel.ForeColor = Color.DarkOrange;
                     gbJob.Enabled = false;  
-                    User user = null;
+                    User user;
                     Cursor = Cursors.WaitCursor;
                     try
                     {

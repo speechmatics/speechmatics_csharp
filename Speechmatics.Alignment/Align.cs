@@ -4,7 +4,7 @@ using System.IO;
 using System.Windows.Forms;
 using Speechmatics.API;
 
-namespace Speechmatics.Transcription
+namespace Speechmatics.Alignment
 {
     public partial class Align : Form
     {
@@ -57,9 +57,9 @@ namespace Speechmatics.Transcription
                 {
                     _files = Directory.GetFiles(fbdUploadDir.SelectedPath);
                     var audioCount = 0;
-                    for (var i = 0; i < _files.Length; i++ )
+                    foreach (string t in _files)
                     {
-                        if (IsAudio(_files[i]) && GetText(_files[i]) != null)
+                        if (IsAudio(t) && GetText(t) != null)
                         {
                             audioCount++;
                         }
@@ -67,12 +67,12 @@ namespace Speechmatics.Transcription
                     _audioFiles = new string[audioCount];
                     _textFiles = new string[audioCount];
                     audioCount = 0;
-                    for (var i = 0; i < _files.Length; i++)
+                    foreach (string t in _files)
                     {
-                        if (IsAudio(_files[i]) && GetText(_files[i]) != null)
+                        if (IsAudio(t) && GetText(t) != null)
                         {
-                            _audioFiles[audioCount] = _files[i];
-                            _textFiles[audioCount] = GetText(_files[i]);
+                            _audioFiles[audioCount] = t;
+                            _textFiles[audioCount] = GetText(t);
                             audioCount++;
                         }
                     }
@@ -92,10 +92,10 @@ namespace Speechmatics.Transcription
         private static bool IsAudio(string filename)
         {
             var ext = Path.GetExtension(filename);
-            var allowedExt = new String[5] { ".wav", ".mp3", ".mp4", ".wma", ".ogg" };
-            for (var j=0; j<allowedExt.Length; j++)
+            var allowedExt = new[] { ".wav", ".mp3", ".mp4", ".wma", ".ogg" };
+            foreach (string t in allowedExt)
             {
-                if(ext.Equals(allowedExt[j], StringComparison.InvariantCultureIgnoreCase))
+                if(ext.Equals(t, StringComparison.InvariantCultureIgnoreCase))
                 {
                     return true;
                 }
@@ -106,11 +106,11 @@ namespace Speechmatics.Transcription
         private string GetText(string filename)
         {
             var basename = Path.GetFileNameWithoutExtension(filename);
-            for (var i=0;i<_files.Length;i++)
+            foreach (string t in _files)
             {
-                if((! _files[i].Equals(filename)) && (basename.Equals(Path.GetFileNameWithoutExtension(_files[i]))))
+                if((! t.Equals(filename)) && (basename.Equals(Path.GetFileNameWithoutExtension(t))))
                 {
-                    return _files[i];
+                    return t;
                 }
             }
                 return null;
@@ -129,9 +129,11 @@ namespace Speechmatics.Transcription
             {
                 if (_audioFiles[i].Equals(_textFiles[i]))
                 {
-                    _jobs[i] = new Job(0, 0);
-                    _jobs[i].Status = "done";
-                    _jobs[i].Name = _audioFiles[i];
+                    _jobs[i] = new Job(0, 0)
+                    {
+                        Status = "done",
+                        Name = _audioFiles[i]
+                    };
                     rtbOutput.Text += "Error uploading file " + _audioFiles[i] + "\n";
                     _outputs[i] = "Text and audio are the same file - cannot align\n";
                 }
@@ -144,9 +146,11 @@ namespace Speechmatics.Transcription
                     }
                     else
                     {
-                        _jobs[i] = new Job(0, 0);
-                        _jobs[i].Status = "done";
-                        _jobs[i].Name = _audioFiles[i];
+                        _jobs[i] = new Job(0, 0)
+                        {
+                            Status = "done",
+                            Name = _audioFiles[i]
+                        };
                         rtbOutput.Text += "Error uploading file " + _audioFiles[i] + "\n";
                         _outputs[i] = "Error uploading file " + _audioFiles[i] + "\n";
                     }
@@ -168,14 +172,13 @@ namespace Speechmatics.Transcription
         {
             if (!string.IsNullOrEmpty(tbUserId.Text) && !string.IsNullOrEmpty(tbAuthToken.Text))
             {
-                var userId = -1;
-                if (Int32.TryParse(tbUserId.Text, out userId))
+                if (Int32.TryParse(tbUserId.Text, out var userId))
                 {
                     _sc = new SpeechmaticsClient(userId, tbAuthToken.Text);
                     connectStatusLabel.Text = "Connection status: Not Connected";
                     connectStatusLabel.ForeColor = Color.DarkOrange;
                     gbJob.Enabled = false;  
-                    User user = null;
+                    User user;
                     Cursor = Cursors.WaitCursor;
                     try
                     {

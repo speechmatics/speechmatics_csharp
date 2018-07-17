@@ -1,4 +1,4 @@
-﻿namespace Speechmatics.Transcription
+﻿namespace Speechmatics.Alignment
 {
     partial class Align
     {
