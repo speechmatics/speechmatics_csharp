@@ -16,7 +16,7 @@ namespace Speechmatics.Transcription
         public Transcribe()
         {
             InitializeComponent();
-            sc = null;
+            _sc = null;
             gbJob.Enabled = false;
         }
 
@@ -29,12 +29,12 @@ namespace Speechmatics.Transcription
                 this.Cursor = Cursors.WaitCursor;
                 try
                 {
-                    files = new string[1];
-                    jobs = new Job[1];
-                    outputs = new string[1];
-                    files[0] = Path.GetFullPath(ofdUploadFile.FileName);
-                    lblJobName.Text = files[0];
-                    startJobs();
+                    _files = new string[1];
+                    _jobs = new Job[1];
+                    _outputs = new string[1];
+                    _files[0] = Path.GetFullPath(ofdUploadFile.FileName);
+                    lblJobName.Text = _files[0];
+                    StartJobs();
                 }
                 finally
                 {
@@ -51,11 +51,11 @@ namespace Speechmatics.Transcription
                 this.Cursor = Cursors.WaitCursor;
                 try
                 {
-                    files = Directory.GetFiles(fbdUploadDir.SelectedPath);
-                    jobs = new Job[files.Length];
-                    outputs = new string[files.Length];
+                    _files = Directory.GetFiles(fbdUploadDir.SelectedPath);
+                    _jobs = new Job[_files.Length];
+                    _outputs = new string[_files.Length];
                     lblDirName.Text = fbdUploadDir.SelectedPath;
-                    startJobs();
+                    StartJobs();
                 }
                 finally
                 {
@@ -65,7 +65,7 @@ namespace Speechmatics.Transcription
 
         }
 
-        private void startJobs(){           
+        private void StartJobs(){           
             langComboBox.Enabled = false;
             tabType.Enabled = false;
             gbUser.Enabled = false;
@@ -73,40 +73,40 @@ namespace Speechmatics.Transcription
             rtbTranscript.Text = "Your job(s) are currently being transcribed.\r\nPlease wait - when finished your transcription(s) will automatically be displayed here.\n";
             lblJobStatus.Text = "Job status: in progress.";
             lblJobStatus.ForeColor = System.Drawing.Color.Teal;
-            for(var i=0; i < files.Length ; i++)
+            for(var i=0; i < _files.Length ; i++)
             {
-                var resp = sc.CreateTranscriptionJob(files[i], langComboBox.Text, cbxDiarise.Checked);
+                var resp = _sc.CreateTranscriptionJob(_files[i], langComboBox.Text, cbxDiarise.Checked);
                 if (resp != null)
                 {                       
-                    jobs[i] = resp.Job;                       
+                    _jobs[i] = resp.Job;                       
                 }
                 else
                 {
-                    jobs[i] = new Job(0, 0);
-                    jobs[i].Status = "done";
-                    jobs[i].Name = files[i];
-                    rtbTranscript.Text += "Error uploading file " + files[i] + "\n";
-                    outputs[i] = "Error uploading file " + files[i] + "\n";
+                    _jobs[i] = new Job(0, 0);
+                    _jobs[i].Status = "done";
+                    _jobs[i].Name = _files[i];
+                    rtbTranscript.Text += "Error uploading file " + _files[i] + "\n";
+                    _outputs[i] = "Error uploading file " + _files[i] + "\n";
                 }
             }
-            checkCurrentJobs();
+            CheckCurrentJobs();
             tmrStatus.Interval = 10000;
             tmrStatus.Enabled = true;
         }
 
-        private SpeechmaticsClient sc;
-        private Job[] jobs;
-        private string[] outputs;       
-        private string[] files;
+        private SpeechmaticsClient _sc;
+        private Job[] _jobs;
+        private string[] _outputs;       
+        private string[] _files;
         
-        private void refreshClientCredentials()
+        private void RefreshClientCredentials()
         {
             if (!string.IsNullOrEmpty(tbUserId.Text) && !string.IsNullOrEmpty(tbAuthToken.Text))
             {
                 var userId = -1;
                 if (Int32.TryParse(tbUserId.Text, out userId))
                 {
-                    sc = new SpeechmaticsClient(userId, tbAuthToken.Text);
+                    _sc = new SpeechmaticsClient(userId, tbAuthToken.Text);
                     connectStatusLabel.Text = "Connection status: Not Connected";
                     this.connectStatusLabel.ForeColor = System.Drawing.Color.DarkOrange;
                     gbJob.Enabled = false;  
@@ -114,7 +114,7 @@ namespace Speechmatics.Transcription
                     this.Cursor = Cursors.WaitCursor;
                     try
                     {
-                        user = sc.GetUser();
+                        user = _sc.GetUser();
                         if (user != null)
                         {
                             gbJob.Enabled = true;
@@ -134,7 +134,7 @@ namespace Speechmatics.Transcription
                     else
                     {
                         connectStatusLabel.Text = "Connection status: Connected";
-                        lblBalanceValue.Text = formatBalance(user.Balance);
+                        lblBalanceValue.Text = FormatBalance(user.Balance);
                         lblEmailValue.Text = user.Email;
                         connectStatusLabel.ForeColor = System.Drawing.Color.Green;
                     }
@@ -149,46 +149,46 @@ namespace Speechmatics.Transcription
             }
         }
 
-        private void checkCurrentJobs()
+        private void CheckCurrentJobs()
         {
             rtbTranscript.Text = "";
             var completeCount = 0;
-            for (var i = 0; i < jobs.Length; i++)
+            for (var i = 0; i < _jobs.Length; i++)
             {               
-                if (jobs[i].Status != "done")
+                if (_jobs[i].Status != "done")
                 { 
-                    sc.UpdateJobStatus(jobs[i]);
-                    if (jobs[i].Status == "done")
+                    _sc.UpdateJobStatus(_jobs[i]);
+                    if (_jobs[i].Status == "done")
                     {
-                        outputs[i] = sc.getTranscript(jobs[i], "txt");
-                        var sw = new System.IO.StreamWriter(Path.ChangeExtension(files[i], ".txt"));
-                        sw.Write(outputs[i]);
+                        _outputs[i] = _sc.GetTranscript(_jobs[i], "txt");
+                        var sw = new System.IO.StreamWriter(Path.ChangeExtension(_files[i], ".txt"));
+                        sw.Write(_outputs[i]);
                         sw.Close();
-                        sw = new System.IO.StreamWriter(Path.ChangeExtension(files[i], ".json"));
-                        sw.Write(sc.getTranscript(jobs[i], "json"));
+                        sw = new System.IO.StreamWriter(Path.ChangeExtension(_files[i], ".json"));
+                        sw.Write(_sc.GetTranscript(_jobs[i], "json"));
                         sw.Close();
                     }
                 }
                 
-                rtbTranscript.Text += "Job " + jobs[i].Name + " status " + jobs[i].Status;
-                if (jobs[i].Status == "done")
+                rtbTranscript.Text += "Job " + _jobs[i].Name + " status " + _jobs[i].Status;
+                if (_jobs[i].Status == "done")
                 {
                     completeCount++;
                     rtbTranscript.Text += "\nOutput:\n";
-                    rtbTranscript.Text += outputs[i];
+                    rtbTranscript.Text += _outputs[i];
                 }
                 rtbTranscript.Text += "\n---\n";
              }
-            if (completeCount == jobs.Length)
+            if (completeCount == _jobs.Length)
             {
-                unlockClient();
+                UnlockClient();
                 lblJobStatus.Text = "Job status: All jobs complete.";
                 lblJobStatus.ForeColor = System.Drawing.Color.Green;
             }
 
         }
 
-        private void unlockClient()
+        private void UnlockClient()
         {
             tmrStatus.Enabled = false; 
             langComboBox.Enabled = true;
@@ -197,7 +197,7 @@ namespace Speechmatics.Transcription
             cbxDiarise.Enabled = true;
         }
 
-        private string formatBalance(int balance)
+        private string FormatBalance(int balance)
         {
             return $"{balance} credits";
         }
@@ -205,12 +205,12 @@ namespace Speechmatics.Transcription
 
         private void tmrStatus_Tick(object sender, EventArgs e)
         {
-            checkCurrentJobs();
+            CheckCurrentJobs();
         }
 
         private void btnConnect_Click(object sender, EventArgs e)
         {
-            refreshClientCredentials();
+            RefreshClientCredentials();
         }
     }
 }

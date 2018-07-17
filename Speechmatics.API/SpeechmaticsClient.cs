@@ -21,10 +21,10 @@ namespace Speechmatics.API
         /// <param name="authToken">Authentication token obtained from https://app.speechmatics.com/account/ </param>
         public SpeechmaticsClient(int userId, string authToken)
         {
-            wc = new WebClient();
-            baseUri = new Uri("https://api.speechmatics.com/v1.0");
-            this.userId = userId;
-            this.authToken = authToken;
+            _wc = new WebClient();
+            _baseUri = new Uri("https://api.speechmatics.com/v1.0");
+            this._userId = userId;
+            this._authToken = authToken;
         }
 
         /// <summary>
@@ -33,8 +33,8 @@ namespace Speechmatics.API
         /// <returns>User object containing account details or null if an error occurs</returns>
         public User GetUser()
         {
-            var userUri = createUserRelativeUri("/");
-            var userJson = getJson(userUri);
+            var userUri = CreateUserRelativeUri("/");
+            var userJson = GetJson(userUri);
             if (userJson != null)
             {
                 return new User((int)userJson.user.id, (string)userJson.user.email, (int)userJson.user.balance); ;
@@ -49,7 +49,7 @@ namespace Speechmatics.API
         /// <returns>Response object or null if an error occurs</returns>
         public CreateJobResponse CreateTranscriptionJob(string audioFilename, string lang, bool diarise)
         {
-            var uploadUri = createUserRelativeUri("/jobs/");
+            var uploadUri = CreateUserRelativeUri("/jobs/");
             using (var fileStream = new FileStream(audioFilename, FileMode.Open))
             {
                 var jsonResponse = FileUpload.UploadFileForTranscription(uploadUri, Path.GetFileName(audioFilename), fileStream, lang, new NameValueCollection(), diarise);
@@ -73,7 +73,7 @@ namespace Speechmatics.API
         /// <returns>Response object or null if an error occurs</returns>
         public CreateJobResponse CreateAlignmentJob(string audioFilename, string textFileName, string lang)
         {
-            var uploadUri = createUserRelativeUri("/jobs/");
+            var uploadUri = CreateUserRelativeUri("/jobs/");
             using (var fileStream = new FileStream(audioFilename, FileMode.Open))
             {
                 using (var fileStream2 = new FileStream(textFileName, FileMode.Open))
@@ -99,8 +99,8 @@ namespace Speechmatics.API
         /// <returns>Job object or null if an error occurs</returns>
         public Job UpdateJobStatus(Job job)
         {
-            var uploadUri = createUserRelativeUri($"/jobs/{job.Id}/");
-            var jobJson = getJson(uploadUri);
+            var uploadUri = CreateUserRelativeUri($"/jobs/{job.Id}/");
+            var jobJson = GetJson(uploadUri);
             if (jobJson != null)
             {
                 job.Name = jobJson.job.name;
@@ -118,13 +118,13 @@ namespace Speechmatics.API
         /// </summary>
         /// <param name="job">Job to get transcript of</param>
         /// <returns>Transcript in text format or null if an error occurs</returns>
-        public String getTranscript(Job job, string format)
+        public String GetTranscript(Job job, string format)
         {
             var reqParams = new NameValueCollection();
             reqParams.Add("format", format);
-            var uploadUri = createUserRelativeUri($"/jobs/{job.Id}/transcript", reqParams);
+            var uploadUri = CreateUserRelativeUri($"/jobs/{job.Id}/transcript", reqParams);
              
-            return getString(uploadUri);
+            return GetString(uploadUri);
         }
 
         /// <summary>
@@ -132,35 +132,35 @@ namespace Speechmatics.API
         /// </summary>
         /// <param name="job">Job to get alignment of</param>
         /// <returns>Alignment text or null if an error occurs</returns>
-        public String getAlignment(Job job, bool onePerLine)
+        public String GetAlignment(Job job, bool onePerLine)
         {
             var reqParams = new NameValueCollection();
             if (onePerLine)
             {
                 reqParams.Add("tags", "one_per_line");
             }           
-            var uploadUri = createUserRelativeUri($"/jobs/{job.Id}/alignment", reqParams);
+            var uploadUri = CreateUserRelativeUri($"/jobs/{job.Id}/alignment", reqParams);
 
-            return getString(uploadUri);
+            return GetString(uploadUri);
         }
 
         #region Private Helper Methods
         
-        private Uri createUserRelativeUri(String path, NameValueCollection requestParams = null)
+        private Uri CreateUserRelativeUri(String path, NameValueCollection requestParams = null)
         {
             if (requestParams == null)
             {
                 requestParams = new NameValueCollection();
             }
-            requestParams.Add("auth_token", authToken);
+            requestParams.Add("auth_token", _authToken);
             var paramString = "?";
             foreach (string name in requestParams.Keys){
                 paramString += name+"="+requestParams[name]+"&";
             }
-            return new Uri(baseUri, $"/v1.0/user/{userId.ToString()}{path}{paramString}");
+            return new Uri(_baseUri, $"/v1.0/user/{_userId.ToString()}{path}{paramString}");
         }
 
-        private string getString(Uri uri)
+        private string GetString(Uri uri)
         {
             try
             {
@@ -177,9 +177,9 @@ namespace Speechmatics.API
                 return null;
             }
         }
-        private dynamic getJson(Uri uri)
+        private dynamic GetJson(Uri uri)
         {
-            var resp = getString(uri);
+            var resp = GetString(uri);
             return resp == null ? null : JsonConvert.DeserializeObject(resp);
         }
 
@@ -187,10 +187,10 @@ namespace Speechmatics.API
 
         #region Private Members
 
-        private WebClient wc;
-        private Uri baseUri;
-        private int userId;
-        private string authToken;
+        private WebClient _wc;
+        private Uri _baseUri;
+        private int _userId;
+        private string _authToken;
 
         #endregion
     }
