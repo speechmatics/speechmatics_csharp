@@ -237,7 +237,7 @@
             this.loginLabel.Name = "loginLabel";
             this.loginLabel.Size = new System.Drawing.Size(447, 13);
             this.loginLabel.TabIndex = 17;
-            this.loginLabel.Text = "Login to https://www.speechmatics.com/account to find your \'User ID\' and \'API Aut" +
+            this.loginLabel.Text = "Login to https://app.speechmatics.com/account/ to find your \'User ID\' and \'API Aut" +
     "h Token\'";
             // 
             // gbJob

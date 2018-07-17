@@ -18,7 +18,7 @@ namespace Speechmatics.API
         /// Constructor
         /// </summary>
         /// <param name="userId">Unique user Id </param>
-        /// <param name="authToken">Authentication token obtained from http://www.speechmatics.com/account </param>
+        /// <param name="authToken">Authentication token obtained from https://app.speechmatics.com/account/ </param>
         public SpeechmaticsClient(int userId, string authToken)
         {
             wc = new WebClient();
