@@ -120,8 +120,10 @@ namespace Speechmatics.API
         /// <returns>Transcript in text format or null if an error occurs</returns>
         public String GetTranscript(Job job, string format)
         {
-            var reqParams = new NameValueCollection();
-            reqParams.Add("format", format);
+            var reqParams = new NameValueCollection
+            {
+                { "format", format }
+            };
             var uploadUri = CreateUserRelativeUri($"/jobs/{job.Id}/transcript", reqParams);
              
             return GetString(uploadUri);
