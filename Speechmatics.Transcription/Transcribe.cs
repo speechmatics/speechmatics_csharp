@@ -199,7 +199,7 @@ namespace Speechmatics.Transcription
 
         private string formatBalance(int balance)
         {
-            return string.Format("{0} credits", balance);
+            return $"{balance} credits";
         }
 
 

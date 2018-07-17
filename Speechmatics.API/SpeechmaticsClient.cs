@@ -99,7 +99,7 @@ namespace Speechmatics.API
         /// <returns>Job object or null if an error occurs</returns>
         public Job UpdateJobStatus(Job job)
         {
-            Uri uploadUri = createUserRelativeUri(String.Format("/jobs/{0}/", job.Id));
+            Uri uploadUri = createUserRelativeUri($"/jobs/{job.Id}/");
             dynamic jobJson = getJson(uploadUri);
             if (jobJson != null)
             {
@@ -122,7 +122,7 @@ namespace Speechmatics.API
         {
             NameValueCollection reqParams = new NameValueCollection();
             reqParams.Add("format", format);
-            Uri uploadUri = createUserRelativeUri(String.Format("/jobs/{0}/transcript", job.Id), reqParams);
+            Uri uploadUri = createUserRelativeUri($"/jobs/{job.Id}/transcript", reqParams);
              
             return getString(uploadUri);
         }
@@ -139,7 +139,7 @@ namespace Speechmatics.API
             {
                 reqParams.Add("tags", "one_per_line");
             }           
-            Uri uploadUri = createUserRelativeUri(String.Format("/jobs/{0}/alignment", job.Id), reqParams);
+            Uri uploadUri = createUserRelativeUri($"/jobs/{job.Id}/alignment", reqParams);
 
             return getString(uploadUri);
         }
@@ -157,7 +157,7 @@ namespace Speechmatics.API
             foreach (string name in requestParams.Keys){
                 paramString += name+"="+requestParams[name]+"&";
             }
-            return new Uri(baseUri, String.Format("/v1.0/user/{0}{1}{2}", userId.ToString(), path, paramString));
+            return new Uri(baseUri, $"/v1.0/user/{userId.ToString()}{path}{paramString}");
         }
 
         private string getString(Uri uri)

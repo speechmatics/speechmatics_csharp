@@ -63,7 +63,8 @@ namespace Speechmatics.API
 
                 buffer = Encoding.ASCII.GetBytes(boundary + Environment.NewLine);
                 requestStream.Write(buffer, 0, buffer.Length);
-                buffer = Encoding.UTF8.GetBytes(string.Format("Content-Disposition: form-data; name=\"{0}\"; filename=\"{1}\"{2}", "data_file", filename, Environment.NewLine));
+                buffer = Encoding.UTF8.GetBytes(
+                    $"Content-Disposition: form-data; name=\"{"data_file"}\"; filename=\"{filename}\"{Environment.NewLine}");
                 requestStream.Write(buffer, 0, buffer.Length);
                 buffer = Encoding.ASCII.GetBytes(string.Format("Content-Type: {0}{1}{1}", "application/octet-stream", Environment.NewLine));
                 requestStream.Write(buffer, 0, buffer.Length);
@@ -132,7 +133,8 @@ namespace Speechmatics.API
 
                 buffer = Encoding.ASCII.GetBytes(boundary + Environment.NewLine);
                 requestStream.Write(buffer, 0, buffer.Length);
-                buffer = Encoding.UTF8.GetBytes(string.Format("Content-Disposition: form-data; name=\"{0}\"; filename=\"{1}\"{2}", "data_file", filename, Environment.NewLine));
+                buffer = Encoding.UTF8.GetBytes(
+                    $"Content-Disposition: form-data; name=\"{"data_file"}\"; filename=\"{filename}\"{Environment.NewLine}");
                 requestStream.Write(buffer, 0, buffer.Length);
                 buffer = Encoding.ASCII.GetBytes(string.Format("Content-Type: {0}{1}{1}", "application/octet-stream", Environment.NewLine));
                 requestStream.Write(buffer, 0, buffer.Length);
@@ -144,7 +146,8 @@ namespace Speechmatics.API
 
                 buffer = Encoding.ASCII.GetBytes(boundary + Environment.NewLine);
                 requestStream.Write(buffer, 0, buffer.Length);
-                buffer = Encoding.UTF8.GetBytes(string.Format("Content-Disposition: form-data; name=\"{0}\"; filename=\"{1}\"{2}", "text_file", filename2, Environment.NewLine));
+                buffer = Encoding.UTF8.GetBytes(
+                    $"Content-Disposition: form-data; name=\"{"text_file"}\"; filename=\"{filename2}\"{Environment.NewLine}");
                 requestStream.Write(buffer, 0, buffer.Length);
                 buffer = Encoding.ASCII.GetBytes(string.Format("Content-Type: {0}{1}{1}", "application/octet-stream", Environment.NewLine));
                 requestStream.Write(buffer, 0, buffer.Length);
