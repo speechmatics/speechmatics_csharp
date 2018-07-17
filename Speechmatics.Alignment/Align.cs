@@ -57,7 +57,7 @@ namespace Speechmatics.Alignment
                 {
                     _files = Directory.GetFiles(fbdUploadDir.SelectedPath);
                     var audioCount = 0;
-                    foreach (string t in _files)
+                    foreach (var t in _files)
                     {
                         if (IsAudio(t) && GetText(t) != null)
                         {
@@ -67,7 +67,7 @@ namespace Speechmatics.Alignment
                     _audioFiles = new string[audioCount];
                     _textFiles = new string[audioCount];
                     audioCount = 0;
-                    foreach (string t in _files)
+                    foreach (var t in _files)
                     {
                         if (IsAudio(t) && GetText(t) != null)
                         {
@@ -93,7 +93,7 @@ namespace Speechmatics.Alignment
         {
             var ext = Path.GetExtension(filename);
             var allowedExt = new[] { ".wav", ".mp3", ".mp4", ".wma", ".ogg" };
-            foreach (string t in allowedExt)
+            foreach (var t in allowedExt)
             {
                 if(ext.Equals(t, StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -106,7 +106,7 @@ namespace Speechmatics.Alignment
         private string GetText(string filename)
         {
             var basename = Path.GetFileNameWithoutExtension(filename);
-            foreach (string t in _files)
+            foreach (var t in _files)
             {
                 if((! t.Equals(filename)) && (basename.Equals(Path.GetFileNameWithoutExtension(t))))
                 {
