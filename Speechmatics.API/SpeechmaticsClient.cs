@@ -16,9 +16,10 @@ namespace Speechmatics.API
         /// </summary>
         /// <param name="userId">Unique user Id </param>
         /// <param name="authToken">Authentication token obtained from https://app.speechmatics.com/account/ </param>
-        public SpeechmaticsClient(int userId, string authToken)
+        /// <param name="endpoint">eg https://api.speechmatics.com/v1.0 </param>
+        public SpeechmaticsClient(int userId, string authToken, Uri endpoint = null)
         {
-            _baseUri = new Uri("https://api.speechmatics.com/v1.0");
+            _baseUri = endpoint ?? new Uri("https://api.speechmatics.com/v1.0");
             _userId = userId;
             _authToken = authToken;
         }
