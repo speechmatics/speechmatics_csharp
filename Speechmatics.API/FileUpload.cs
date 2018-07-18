@@ -22,7 +22,7 @@ namespace Speechmatics.API
         /// <param name="values">Collection of additional form [parameters to upload along with file</param>
         /// <param name="diarize"></param>
         /// <returns>String response from server or null if an error occurs</returns>
-        public static String UploadFileForTranscription(Uri uploadUri, string filename, Stream fileStream, string lang, NameValueCollection values, bool diarize)
+        public static string UploadFileForTranscription(Uri uploadUri, string filename, Stream fileStream, string lang, NameValueCollection values, bool diarize)
         {
             var request = WebRequest.Create(uploadUri);
             request.Method = "POST";
@@ -102,10 +102,10 @@ namespace Speechmatics.API
         /// <param name="fileStream">Stream coontaining file data</param>
         /// <param name="lang"></param>
         /// <param name="values">Collection of additional form [parameters to upload along with file</param>
-        /// <param name="filename2"></param>
-        /// <param name="fileStream2"></param>
+        /// <param name="textFilename"></param>
+        /// <param name="textStream"></param>
         /// <returns>String response from server or null if an error occurs</returns>
-        public static String UploadFilesForAlignment(Uri uploadUri, string filename, Stream fileStream, string filename2, Stream fileStream2, string lang, NameValueCollection values)
+        public static string UploadFilesForAlignment(Uri uploadUri, string filename, Stream fileStream, string textFilename, Stream textStream, string lang, NameValueCollection values)
         {
             var request = WebRequest.Create(uploadUri);
             request.Method = "POST";
@@ -151,13 +151,13 @@ namespace Speechmatics.API
                 buffer = Encoding.ASCII.GetBytes(boundary + Environment.NewLine);
                 requestStream.Write(buffer, 0, buffer.Length);
                 buffer = Encoding.UTF8.GetBytes(
-                    $"Content-Disposition: form-data; name=\"text_file\"; filename=\"{filename2}\"{Environment.NewLine}");
+                    $"Content-Disposition: form-data; name=\"text_file\"; filename=\"{textFilename}\"{Environment.NewLine}");
                 requestStream.Write(buffer, 0, buffer.Length);
                 buffer = Encoding.ASCII.GetBytes(string.Format("Content-Type: {0}{1}{1}", "application/octet-stream", Environment.NewLine));
                 requestStream.Write(buffer, 0, buffer.Length);
 
 
-                fileStream2.CopyTo(requestStream);
+                textStream.CopyTo(requestStream);
                 buffer = Encoding.ASCII.GetBytes(Environment.NewLine);
                 requestStream.Write(buffer, 0, buffer.Length);
 

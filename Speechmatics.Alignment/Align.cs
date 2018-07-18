@@ -136,7 +136,7 @@ namespace Speechmatics.Alignment
         {
             if (!string.IsNullOrEmpty(tbUserId.Text) && !string.IsNullOrEmpty(tbAuthToken.Text))
             {
-                if (Int32.TryParse(tbUserId.Text, out var userId))
+                if (int.TryParse(tbUserId.Text, out var userId))
                 {
                     _sc = new SpeechmaticsClient(userId, tbAuthToken.Text);
                     connectStatusLabel.Text = "Connection status: Not Connected";

@@ -72,9 +72,9 @@ namespace Speechmatics.API
             var uploadUri = CreateUserRelativeUri("/jobs/");
             using (var fileStream = new FileStream(audioFilename, FileMode.Open))
             {
-                using (var fileStream2 = new FileStream(textFilename, FileMode.Open))
+                using (var textFileStream = new FileStream(textFilename, FileMode.Open))
                 {
-                    var jsonResponse = FileUpload.UploadFilesForAlignment(uploadUri, Path.GetFileName(audioFilename), fileStream, Path.GetFileName(textFilename), fileStream2, lang, new NameValueCollection());
+                    var jsonResponse = FileUpload.UploadFilesForAlignment(uploadUri, Path.GetFileName(audioFilename), fileStream, Path.GetFileName(textFilename), textFileStream, lang, new NameValueCollection());
                     if (jsonResponse != null)
                     {
                         dynamic jobJson = JsonConvert.DeserializeObject(jsonResponse);
@@ -109,7 +109,7 @@ namespace Speechmatics.API
         /// <param name="job">Job to get transcript of</param>
         /// <param name="format"></param>
         /// <returns>Transcript in text format or null if an error occurs</returns>
-        public String GetTranscript(Job job, string format)
+        public string GetTranscript(Job job, string format)
         {
             var reqParams = new NameValueCollection
             {
@@ -126,7 +126,7 @@ namespace Speechmatics.API
         /// <param name="job">Job to get alignment of</param>
         /// <param name="onePerLine"></param>
         /// <returns>Alignment text or null if an error occurs</returns>
-        public String GetAlignment(Job job, bool onePerLine)
+        public string GetAlignment(Job job, bool onePerLine)
         {
             var reqParams = new NameValueCollection();
             if (onePerLine)
@@ -140,7 +140,7 @@ namespace Speechmatics.API
 
         #region Private Helper Methods
         
-        private Uri CreateUserRelativeUri(String path, NameValueCollection requestParams = null)
+        private Uri CreateUserRelativeUri(string path, NameValueCollection requestParams = null)
         {
             if (requestParams == null)
             {

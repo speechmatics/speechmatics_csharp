@@ -13,7 +13,7 @@ namespace Speechmatics.API
         /// <param name="id">Unique user Id</param>
         /// <param name="email">User's email address</param>
         /// <param name="balance">User's remaining balance (in pence)</param>
-        public User(int id, String email, int balance)
+        public User(int id, string email, int balance)
         {
             Id = id;
             Email = email;
