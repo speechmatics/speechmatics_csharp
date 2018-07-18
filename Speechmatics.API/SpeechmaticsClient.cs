@@ -117,7 +117,7 @@ namespace Speechmatics.API
             };
             var uploadUri = CreateUserRelativeUri($"/jobs/{job.Id}/transcript", reqParams);
              
-            return GetString(uploadUri);
+            return GetUri(uploadUri);
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace Speechmatics.API
             }           
             var uploadUri = CreateUserRelativeUri($"/jobs/{job.Id}/alignment", reqParams);
 
-            return GetString(uploadUri);
+            return GetUri(uploadUri);
         }
 
         #region Private Helper Methods
@@ -154,16 +154,18 @@ namespace Speechmatics.API
             return new Uri(_baseUri, $"/v1.0/user/{_userId}{path}{paramString}");
         }
 
-        private static string GetString(Uri uri)
+        private static string GetUri(Uri uri)
         {
             try
             {
                 var request = WebRequest.Create(uri);
-                var response = (HttpWebResponse)request.GetResponse();
 
-                using (var sr = new StreamReader(response.GetResponseStream()))
+                using (var response = (HttpWebResponse) request.GetResponse())
                 {
-                    return sr.ReadToEnd();
+                    using (var sr = new StreamReader(response.GetResponseStream()))
+                    {
+                        return sr.ReadToEnd();
+                    }
                 }
             }
             catch (WebException)
@@ -173,7 +175,7 @@ namespace Speechmatics.API
         }
         private dynamic GetJson(Uri uri)
         {
-            var resp = GetString(uri);
+            var resp = GetUri(uri);
             return resp == null ? null : JsonConvert.DeserializeObject(resp);
         }
 
