@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 using Speechmatics.API;
 
@@ -16,7 +17,7 @@ namespace Speechmatics.Alignment
             internal string TextFile { get; set; }
         }
 
-        private SpeechmaticsClient _sc;
+        private SpeechmaticsClient _smClient;
         private readonly List<Job> _jobs;
         private readonly List<AlignmentJobInputData> _inputData;
 
@@ -74,7 +75,8 @@ namespace Speechmatics.Alignment
                 foreach (var filename in validAudioFiles)
                 {
                     var shortName = Path.GetFileNameWithoutExtension(filename);
-                    var matchingTextFile = allFiles.FirstOrDefault(c => c != filename && Path.GetFileNameWithoutExtension(c) == shortName);
+                    var matchingTextFile = allFiles.FirstOrDefault(c =>
+                        c != filename && Path.GetFileNameWithoutExtension(c) == shortName);
                     if (matchingTextFile != null)
                     {
                         _inputData.Add(new AlignmentJobInputData
@@ -97,7 +99,7 @@ namespace Speechmatics.Alignment
         private static bool IsAudio(string filename)
         {
             var ext = Path.GetExtension(filename).ToLowerInvariant();
-            var allowedExt = new[] { ".wav", ".mp3", ".mp4", ".wma", ".ogg" };
+            var allowedExt = new[] {".wav", ".mp3", ".mp4", ".wma", ".ogg"};
             return allowedExt.Any(t => ext == t);
         }
 
@@ -106,13 +108,13 @@ namespace Speechmatics.Alignment
             langComboBox.Enabled = false;
             tabType.Enabled = false;
             gbUser.Enabled = false;
-            lblJobStatus.ForeColor = Color.Teal;
-            rtbOutput.Text = "Your job is currently being aligned.\r\nPlease wait - when it is finished your alignment(s) will automatically be displayed here.\n";
+            rtbOutput.Text =
+                "Your job is currently being aligned.\r\nPlease wait - when it is finished your alignment(s) will automatically be displayed here.\n";
             lblJobStatus.Text = "Job status: in progress.";
             lblJobStatus.ForeColor = Color.Teal;
-            foreach(var data in _inputData)
+            foreach (var data in _inputData)
             {
-                var resp = _sc.CreateAlignmentJob(data.AudioFile, data.TextFile, langComboBox.Text);
+                var resp = _smClient.CreateAlignmentJob(data.AudioFile, data.TextFile, langComboBox.Text);
                 if (resp != null)
                 {
                     _jobs.Add(resp.Job);
@@ -131,85 +133,86 @@ namespace Speechmatics.Alignment
             tmrStatus.Interval = 10000;
             tmrStatus.Enabled = true;
         }
-        
+
+        private void InvalidCredentials()
+        {
+            connectStatusLabel.Text = "Connection status: Invalid User ID";
+            lblBalanceValue.Text = "Not Connected";
+            lblEmailValue.Text = "Not Connected";
+            gbJob.Enabled = false;
+        }
+
         private void RefreshClientCredentials()
         {
-            if (!string.IsNullOrEmpty(tbUserId.Text) && !string.IsNullOrEmpty(tbAuthToken.Text))
+            if (string.IsNullOrEmpty(tbUserId.Text) ||
+                string.IsNullOrEmpty(tbAuthToken.Text) ||
+                !int.TryParse(tbUserId.Text, out var userId))
             {
-                if (int.TryParse(tbUserId.Text, out var userId))
+                InvalidCredentials();
+                return;
+            }
+
+            _smClient = new SpeechmaticsClient(userId, tbAuthToken.Text);
+            connectStatusLabel.Text = "Connection status: Not Connected";
+            connectStatusLabel.ForeColor = Color.DarkOrange;
+            gbJob.Enabled = false;
+            User user;
+            Cursor = Cursors.WaitCursor;
+            try
+            {
+                user = _smClient.GetUser();
+                if (user != null)
                 {
-                    _sc = new SpeechmaticsClient(userId, tbAuthToken.Text);
-                    connectStatusLabel.Text = "Connection status: Not Connected";
-                    connectStatusLabel.ForeColor = Color.DarkOrange;
-                    gbJob.Enabled = false;  
-                    User user;
-                    Cursor = Cursors.WaitCursor;
-                    try
-                    {
-                        user = _sc.GetUser();
-                        if (user != null)
-                        {
-                            gbJob.Enabled = true;
-                        }
-                    }
-                    finally
-                    {
-                        Cursor = Cursors.Default;
-                    }
-                    if (null == user)
-                    {
-                        connectStatusLabel.Text = "Connection status: Invalid Auth Token";
-                        lblBalanceValue.Text = "Not Connected";
-                        lblEmailValue.Text = "Not Connected";
-                        gbJob.Enabled = false;
-                    }
-                    else
-                    {
-                        connectStatusLabel.Text = "Connection status: Connected";
-                        lblBalanceValue.Text = FormatBalance(user.Balance);
-                        lblEmailValue.Text = user.Email;
-                        connectStatusLabel.ForeColor = Color.Green;
-                    }
-                }
-                else
-                {
-                    connectStatusLabel.Text = "Connection status: Invalid User ID";
-                    lblBalanceValue.Text = "Not Connected";
-                    lblEmailValue.Text = "Not Connected";
-                    gbJob.Enabled = false;
+                    gbJob.Enabled = true;
                 }
             }
+            finally
+            {
+                Cursor = Cursors.Default;
+            }
+            if (null == user)
+            {
+                connectStatusLabel.Text = "Connection status: Invalid Auth Token";
+                lblBalanceValue.Text = "Not Connected";
+                lblEmailValue.Text = "Not Connected";
+                gbJob.Enabled = false;
+                return;
+            }
+            connectStatusLabel.Text = "Connection status: Connected";
+            lblBalanceValue.Text = FormatBalance(user.Balance);
+            lblEmailValue.Text = user.Email;
+            connectStatusLabel.ForeColor = Color.Green;
         }
 
         private void CheckCurrentJobs()
         {
-            rtbOutput.Text = "";
+            var outputText = new StringBuilder();
 
             foreach (var job in _jobs)
             {
                 if (job.Status != "done")
                 {
-                    _sc.UpdateJobStatus(job);
+                    _smClient.UpdateJobStatus(job);
                 }
 
-                rtbOutput.Text += "Job " + job.Name + " status " + job.Status;
+                outputText.AppendLine($"Job {job.Name} status {job.Status}");
 
                 if (job.Status == "done")
                 {
-                    rtbOutput.Text += "\nOutput:\n";
-                    rtbOutput.Text += _sc.GetAlignment(job, true);
+                    outputText.AppendLine("Output:");
+                    outputText.AppendLine(_smClient.GetAlignment(job, true));
 
                     using (var sw = new StreamWriter(Path.ChangeExtension(job.Name, "word-timings.txt")))
                     {
-                        sw.Write(_sc.GetAlignment(job, false));
+                        sw.Write(_smClient.GetAlignment(job, false));
                     }
                     using (var sw = new StreamWriter(Path.ChangeExtension(job.Name, "line-timings.txt")))
                     {
-                        sw.Write(_sc.GetAlignment(job, true));
+                        sw.Write(_smClient.GetAlignment(job, true));
                     }
                 }
 
-                rtbOutput.Text += "\n---\n";
+                outputText.AppendLine("---");
             }
 
             if (_jobs.All(job => job.Status == "done"))
@@ -219,6 +222,7 @@ namespace Speechmatics.Alignment
                 lblJobStatus.ForeColor = Color.Green;
             }
 
+            rtbOutput.Text = outputText.ToString();
         }
 
         private void UnlockClient()

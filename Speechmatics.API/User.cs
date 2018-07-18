@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Speechmatics.API
+﻿namespace Speechmatics.API
 {
     /// <summary>
     /// Class representing a user of the speechmatics API

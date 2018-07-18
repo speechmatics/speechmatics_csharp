@@ -39,7 +39,8 @@ namespace Speechmatics.API
                 {
                     buffer = Encoding.ASCII.GetBytes(boundary + Environment.NewLine);
                     requestStream.Write(buffer, 0, buffer.Length);
-                    buffer = Encoding.ASCII.GetBytes(string.Format("Content-Disposition: form-data; name=\"{0}\"{1}{1}", name, Environment.NewLine));
+                    buffer = Encoding.ASCII.GetBytes(
+                        $"Content-Disposition: form-data; name=\"{name}\"{Environment.NewLine}{Environment.NewLine}");
                     requestStream.Write(buffer, 0, buffer.Length);
                     buffer = Encoding.UTF8.GetBytes(values[name] + Environment.NewLine);
                     requestStream.Write(buffer, 0, buffer.Length);
@@ -49,7 +50,8 @@ namespace Speechmatics.API
                 {
                     buffer = Encoding.ASCII.GetBytes(boundary + Environment.NewLine);
                     requestStream.Write(buffer, 0, buffer.Length);
-                    buffer = Encoding.UTF8.GetBytes(string.Format("Content-Disposition: form-data; name=\"{0}\"{1}{1}", "diarisation", Environment.NewLine));
+                    buffer = Encoding.UTF8.GetBytes(
+                        $"Content-Disposition: form-data; name=\"diarisation\"{Environment.NewLine}{Environment.NewLine}");
                     requestStream.Write(buffer, 0, buffer.Length);
                     buffer = Encoding.ASCII.GetBytes(string.Format("false" + Environment.NewLine));
                     requestStream.Write(buffer, 0, buffer.Length);
@@ -57,7 +59,8 @@ namespace Speechmatics.API
 
                 buffer = Encoding.ASCII.GetBytes(boundary + Environment.NewLine);
                 requestStream.Write(buffer, 0, buffer.Length);
-                buffer = Encoding.UTF8.GetBytes(string.Format("Content-Disposition: form-data; name=\"{0}\"{1}{1}", "model", Environment.NewLine));
+                buffer = Encoding.UTF8.GetBytes(
+                    $"Content-Disposition: form-data; name=\"model\"{Environment.NewLine}{Environment.NewLine}");
                 requestStream.Write(buffer, 0, buffer.Length);
                 buffer = Encoding.ASCII.GetBytes(string.Format(lang + Environment.NewLine));
                 requestStream.Write(buffer, 0, buffer.Length);
@@ -67,7 +70,8 @@ namespace Speechmatics.API
                 buffer = Encoding.UTF8.GetBytes(
                     $"Content-Disposition: form-data; name=\"data_file\"; filename=\"{filename}\"{Environment.NewLine}");
                 requestStream.Write(buffer, 0, buffer.Length);
-                buffer = Encoding.ASCII.GetBytes(string.Format("Content-Type: {0}{1}{1}", "application/octet-stream", Environment.NewLine));
+                buffer = Encoding.ASCII.GetBytes(
+                    $"Content-Type: application/octet-stream{Environment.NewLine}{Environment.NewLine}");
                 requestStream.Write(buffer, 0, buffer.Length);
                 
                 
@@ -88,7 +92,7 @@ namespace Speechmatics.API
                     return Encoding.UTF8.GetString(stream.ToArray());
                 }
             }
-            catch (WebException )
+            catch (WebException)
             {
                 return null;
             }
@@ -122,7 +126,8 @@ namespace Speechmatics.API
                 {
                     buffer = Encoding.ASCII.GetBytes(boundary + Environment.NewLine);
                     requestStream.Write(buffer, 0, buffer.Length);
-                    buffer = Encoding.ASCII.GetBytes(string.Format("Content-Disposition: form-data; name=\"{0}\"{1}{1}", name, Environment.NewLine));
+                    buffer = Encoding.ASCII.GetBytes(
+                        $"Content-Disposition: form-data; name=\"{name}\"{Environment.NewLine}{Environment.NewLine}");
                     requestStream.Write(buffer, 0, buffer.Length);
                     buffer = Encoding.UTF8.GetBytes(values[name] + Environment.NewLine);
                     requestStream.Write(buffer, 0, buffer.Length);
@@ -130,7 +135,8 @@ namespace Speechmatics.API
 
                 buffer = Encoding.ASCII.GetBytes(boundary + Environment.NewLine);
                 requestStream.Write(buffer, 0, buffer.Length);
-                buffer = Encoding.UTF8.GetBytes(string.Format("Content-Disposition: form-data; name=\"{0}\"{1}{1}", "model", Environment.NewLine));
+                buffer = Encoding.UTF8.GetBytes(
+                    $"Content-Disposition: form-data; name=\"model\"{Environment.NewLine}{Environment.NewLine}");
                 requestStream.Write(buffer, 0, buffer.Length);
                 buffer = Encoding.ASCII.GetBytes(string.Format(lang + Environment.NewLine));
                 requestStream.Write(buffer, 0, buffer.Length);
@@ -140,7 +146,8 @@ namespace Speechmatics.API
                 buffer = Encoding.UTF8.GetBytes(
                     $"Content-Disposition: form-data; name=\"data_file\"; filename=\"{filename}\"{Environment.NewLine}");
                 requestStream.Write(buffer, 0, buffer.Length);
-                buffer = Encoding.ASCII.GetBytes(string.Format("Content-Type: {0}{1}{1}", "application/octet-stream", Environment.NewLine));
+                buffer = Encoding.ASCII.GetBytes(
+                    $"Content-Type: application/octet-stream{Environment.NewLine}{Environment.NewLine}");
                 requestStream.Write(buffer, 0, buffer.Length);
 
 
@@ -153,7 +160,8 @@ namespace Speechmatics.API
                 buffer = Encoding.UTF8.GetBytes(
                     $"Content-Disposition: form-data; name=\"text_file\"; filename=\"{textFilename}\"{Environment.NewLine}");
                 requestStream.Write(buffer, 0, buffer.Length);
-                buffer = Encoding.ASCII.GetBytes(string.Format("Content-Type: {0}{1}{1}", "application/octet-stream", Environment.NewLine));
+                buffer = Encoding.ASCII.GetBytes(
+                    $"Content-Type: application/octet-stream{Environment.NewLine}{Environment.NewLine}");
                 requestStream.Write(buffer, 0, buffer.Length);
 
 

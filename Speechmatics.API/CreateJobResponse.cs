@@ -14,6 +14,7 @@
         public CreateJobResponse(int jobId, int cost, int balance)
         {
             Job = new Job(jobId, cost);
+            Balance = balance;
         }
 
         /// <summary>
@@ -23,6 +24,6 @@
         /// <summary>
         /// User's remaining balance (in pence)
         /// </summary>
-        public int Balance { get; private set; }
+        public int Balance { get; }
     }
 }
