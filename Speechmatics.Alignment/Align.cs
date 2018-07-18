@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using Speechmatics.API;
 
@@ -8,11 +10,22 @@ namespace Speechmatics.Alignment
 {
     public partial class Align : Form
     {
+        private class AlignmentJobInputData
+        {
+            internal string AudioFile { get; set; }
+            internal string TextFile { get; set; }
+        }
+
+        private SpeechmaticsClient _sc;
+        private readonly List<Job> _jobs;
+        private readonly List<AlignmentJobInputData> _inputData;
+
         public Align()
         {
             InitializeComponent();
-            _sc = null;
             gbJob.Enabled = false;
+            _jobs = new List<Job>();
+            _inputData = new List<AlignmentJobInputData>();
         }
 
         private void btnUploadFile_MouseClick(object sender, MouseEventArgs e)
@@ -24,15 +37,15 @@ namespace Speechmatics.Alignment
                 var audioFilePath = Path.GetFullPath(ofdUploadFile.FileName);
                 ofdUploadFile.Title = "Select text file to be aligned";
                 var drText = ofdUploadFile.ShowDialog();
-                if (drAudio == DialogResult.OK)
+                if (drText == DialogResult.OK)
                 {
                     var textFilePath = Path.GetFullPath(ofdUploadFile.FileName);
-                    _audioFiles = new string[1];
-                    _textFiles = new string[1];
-                    _jobs = new Job[1];
-                    _outputs = new string[1];
-                    _audioFiles[0] = audioFilePath;
-                    _textFiles[0] = textFilePath;
+                    _inputData.Add(new AlignmentJobInputData
+                    {
+                        AudioFile = audioFilePath,
+                        TextFile = textFilePath
+                    });
+
                     Cursor = Cursors.WaitCursor;
                     try
                     {
@@ -50,70 +63,42 @@ namespace Speechmatics.Alignment
         private void btnUploadDir_MouseClick(object sender, MouseEventArgs e)
         {
             var dr = fbdUploadDir.ShowDialog();
-            if (dr == DialogResult.OK)
-            {
-                Cursor = Cursors.WaitCursor;
-                try
-                {
-                    _files = Directory.GetFiles(fbdUploadDir.SelectedPath);
-                    var audioCount = 0;
-                    foreach (var t in _files)
-                    {
-                        if (IsAudio(t) && GetText(t) != null)
-                        {
-                            audioCount++;
-                        }
-                    }
-                    _audioFiles = new string[audioCount];
-                    _textFiles = new string[audioCount];
-                    audioCount = 0;
-                    foreach (var t in _files)
-                    {
-                        if (IsAudio(t) && GetText(t) != null)
-                        {
-                            _audioFiles[audioCount] = t;
-                            _textFiles[audioCount] = GetText(t);
-                            audioCount++;
-                        }
-                    }
-                    _jobs = new Job[audioCount];
-                    _outputs = new string[audioCount];
-                    lblDirName.Text = fbdUploadDir.SelectedPath;
-                    StartJobs();
-                }
-                finally
-                {
-                    Cursor = Cursors.Default;
-                }
-            }
+            if (dr != DialogResult.OK) return;
 
+            Cursor = Cursors.WaitCursor;
+            try
+            {
+                var allFiles = Directory.GetFiles(fbdUploadDir.SelectedPath);
+                var validAudioFiles = allFiles.Where(IsAudio);
+
+                foreach (var filename in validAudioFiles)
+                {
+                    var shortName = Path.GetFileNameWithoutExtension(filename);
+                    var matchingTextFile = allFiles.FirstOrDefault(c => c != filename && Path.GetFileNameWithoutExtension(c) == shortName);
+                    if (matchingTextFile != null)
+                    {
+                        _inputData.Add(new AlignmentJobInputData
+                        {
+                            AudioFile = filename,
+                            TextFile = matchingTextFile
+                        });
+                    }
+                }
+
+                lblDirName.Text = fbdUploadDir.SelectedPath;
+                StartJobs();
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
+            }
         }
 
         private static bool IsAudio(string filename)
         {
-            var ext = Path.GetExtension(filename);
+            var ext = Path.GetExtension(filename).ToLowerInvariant();
             var allowedExt = new[] { ".wav", ".mp3", ".mp4", ".wma", ".ogg" };
-            foreach (var t in allowedExt)
-            {
-                if(ext.Equals(t, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private string GetText(string filename)
-        {
-            var basename = Path.GetFileNameWithoutExtension(filename);
-            foreach (var t in _files)
-            {
-                if((! t.Equals(filename)) && (basename.Equals(Path.GetFileNameWithoutExtension(t))))
-                {
-                    return t;
-                }
-            }
-                return null;
+            return allowedExt.Any(t => ext == t);
         }
 
         private void StartJobs()
@@ -125,48 +110,27 @@ namespace Speechmatics.Alignment
             rtbOutput.Text = "Your job is currently being aligned.\r\nPlease wait - when it is finished your alignment(s) will automatically be displayed here.\n";
             lblJobStatus.Text = "Job status: in progress.";
             lblJobStatus.ForeColor = Color.Teal;
-            for (var i = 0; i < _audioFiles.Length; i++)
+            foreach(var data in _inputData)
             {
-                if (_audioFiles[i].Equals(_textFiles[i]))
+                var resp = _sc.CreateAlignmentJob(data.AudioFile, data.TextFile, langComboBox.Text);
+                if (resp != null)
                 {
-                    _jobs[i] = new Job(0, 0)
-                    {
-                        Status = "done",
-                        Name = _audioFiles[i]
-                    };
-                    rtbOutput.Text += "Error uploading file " + _audioFiles[i] + "\n";
-                    _outputs[i] = "Text and audio are the same file - cannot align\n";
+                    _jobs.Add(resp.Job);
                 }
                 else
                 {
-                    var resp = _sc.CreateAlignmentJob(_audioFiles[i], _textFiles[i], langComboBox.Text);
-                    if (resp != null)
+                    _jobs.Add(new Job(0, 0)
                     {
-                        _jobs[i] = resp.Job;
-                    }
-                    else
-                    {
-                        _jobs[i] = new Job(0, 0)
-                        {
-                            Status = "done",
-                            Name = _audioFiles[i]
-                        };
-                        rtbOutput.Text += "Error uploading file " + _audioFiles[i] + "\n";
-                        _outputs[i] = "Error uploading file " + _audioFiles[i] + "\n";
-                    }
+                        Status = "done",
+                        Name = data.AudioFile
+                    });
+                    rtbOutput.Text += "Error uploading file " + data.AudioFile + "\n";
                 }
             }
             CheckCurrentJobs();
             tmrStatus.Interval = 10000;
             tmrStatus.Enabled = true;
         }
-
-        private SpeechmaticsClient _sc;
-        private Job[] _jobs;
-        private string[] _outputs;
-        private string[] _files;
-        private string[] _audioFiles;
-        private string[] _textFiles;
         
         private void RefreshClientCredentials()
         {
@@ -220,35 +184,35 @@ namespace Speechmatics.Alignment
         private void CheckCurrentJobs()
         {
             rtbOutput.Text = "";
-            var completeCount = 0;
-            for (var i = 0; i < _jobs.Length; i++)
+
+            foreach (var job in _jobs)
             {
-                if (_jobs[i].Status != "done")
+                if (job.Status != "done")
                 {
-                    _sc.UpdateJobStatus(_jobs[i]);
-                    if (_jobs[i].Status == "done")
+                    _sc.UpdateJobStatus(job);
+                }
+
+                rtbOutput.Text += "Job " + job.Name + " status " + job.Status;
+
+                if (job.Status == "done")
+                {
+                    rtbOutput.Text += "\nOutput:\n";
+                    rtbOutput.Text += _sc.GetAlignment(job, true);
+
+                    using (var sw = new StreamWriter(Path.ChangeExtension(job.Name, "word-timings.txt")))
                     {
-                        _outputs[i] = _sc.GetAlignment(_jobs[i], true);
-                        var ext = Path.GetExtension(_textFiles[i]);
-                        var sw = new StreamWriter(Path.ChangeExtension(_textFiles[i], "word-timings" + ext));
-                        sw.Write(_sc.GetAlignment(_jobs[i], false));
-                        sw.Close();
-                        sw = new StreamWriter(Path.ChangeExtension(_audioFiles[i], "line-timings" + ext));
-                        sw.Write(_sc.GetAlignment(_jobs[i], true));
-                        sw.Close();
+                        sw.Write(_sc.GetAlignment(job, false));
+                    }
+                    using (var sw = new StreamWriter(Path.ChangeExtension(job.Name, "line-timings.txt")))
+                    {
+                        sw.Write(_sc.GetAlignment(job, true));
                     }
                 }
 
-                rtbOutput.Text += "Job " + _jobs[i].Name + " status " + _jobs[i].Status;
-                if (_jobs[i].Status == "done")
-                {
-                    completeCount++;
-                    rtbOutput.Text += "\nOutput:\n";
-                    rtbOutput.Text += _outputs[i];
-                }
                 rtbOutput.Text += "\n---\n";
             }
-            if (completeCount == _jobs.Length)
+
+            if (_jobs.All(job => job.Status == "done"))
             {
                 UnlockClient();
                 lblJobStatus.Text = "Job status: All jobs complete.";
