@@ -175,11 +175,15 @@ namespace Speechmatics.API
             try
             {
                 using (var response = request.GetResponse())
-                using (var responseStream = response.GetResponseStream())
-                using (var stream = new MemoryStream())
                 {
-                    responseStream.CopyTo(stream);
-                    return Encoding.UTF8.GetString(stream.ToArray());
+                    using (var responseStream = response.GetResponseStream())
+                    {
+                        using (var stream = new MemoryStream())
+                        {
+                            responseStream.CopyTo(stream);
+                            return Encoding.UTF8.GetString(stream.ToArray());
+                        }
+                    }
                 }
             }
             catch (WebException)
