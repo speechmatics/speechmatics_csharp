@@ -5,3 +5,4 @@ Speechmatics.Alignment/obj/**
 Speechmatics.API/obj/**
 Speechmatics.Transcription/obj/**
 packages/
+.vs/
