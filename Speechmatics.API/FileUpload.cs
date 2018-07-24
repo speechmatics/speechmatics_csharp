@@ -37,7 +37,8 @@ namespace Speechmatics.API
             var formParameters = new Dictionary<string, string>
             {
                 ["diarise"] = diarize ? "true" : "false",
-                ["model"] = lang
+                ["model"] = lang,
+                ["transcription_config"] = "ignored_by_saas",
             };
 
             var request = WebRequest.Create(uploadUri);
