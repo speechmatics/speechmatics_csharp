@@ -12,6 +12,15 @@ namespace Speechmatics.API
     /// </summary>
     public class FileUpload
     {
+        private static readonly byte[] newline = {(byte) '\r', (byte) '\n'};
+
+        private static void WriteStringToStream(string s, Stream stream)
+        {
+            var buffer = Encoding.ASCII.GetBytes(s);
+            stream.Write(buffer, 0, buffer.Length);
+            stream.Write(newline, 0, newline.Length);
+        }
+
         /// <summary>
         /// Upload a file
         /// </summary>
@@ -32,55 +41,23 @@ namespace Speechmatics.API
 
             using (var requestStream = request.GetRequestStream())
             {
-                byte[] buffer;
+                values["diarise"] = diarize ? "true" : "false";
+                values["model"] = lang;
 
                 // Write the values
                 foreach (string name in values.Keys)
                 {
-                    buffer = Encoding.ASCII.GetBytes(boundary + Environment.NewLine);
-                    requestStream.Write(buffer, 0, buffer.Length);
-                    buffer = Encoding.ASCII.GetBytes(
-                        $"Content-Disposition: form-data; name=\"{name}\"{Environment.NewLine}{Environment.NewLine}");
-                    requestStream.Write(buffer, 0, buffer.Length);
-                    buffer = Encoding.UTF8.GetBytes(values[name] + Environment.NewLine);
-                    requestStream.Write(buffer, 0, buffer.Length);
+                    WriteStringToStream(boundary, requestStream);
+                    WriteStringToStream($"Content-Disposition: form-data; name=\"{name}\"\r\n", requestStream);
+                    WriteStringToStream(values[name], requestStream);
                 }
 
-                if (!diarize)
-                {
-                    buffer = Encoding.ASCII.GetBytes(boundary + Environment.NewLine);
-                    requestStream.Write(buffer, 0, buffer.Length);
-                    buffer = Encoding.UTF8.GetBytes(
-                        $"Content-Disposition: form-data; name=\"diarisation\"{Environment.NewLine}{Environment.NewLine}");
-                    requestStream.Write(buffer, 0, buffer.Length);
-                    buffer = Encoding.ASCII.GetBytes(string.Format("false" + Environment.NewLine));
-                    requestStream.Write(buffer, 0, buffer.Length);
-                }
+                WriteStringToStream(boundary, requestStream);
+                WriteStringToStream($"Content-Disposition: form-data; name=\"data_file\"; filename=\"{filename}\";\r\nContent-Type: application/octet-stream\"\r\n", requestStream);
 
-                buffer = Encoding.ASCII.GetBytes(boundary + Environment.NewLine);
-                requestStream.Write(buffer, 0, buffer.Length);
-                buffer = Encoding.UTF8.GetBytes(
-                    $"Content-Disposition: form-data; name=\"model\"{Environment.NewLine}{Environment.NewLine}");
-                requestStream.Write(buffer, 0, buffer.Length);
-                buffer = Encoding.ASCII.GetBytes(string.Format(lang + Environment.NewLine));
-                requestStream.Write(buffer, 0, buffer.Length);
-
-                buffer = Encoding.ASCII.GetBytes(boundary + Environment.NewLine);
-                requestStream.Write(buffer, 0, buffer.Length);
-                buffer = Encoding.UTF8.GetBytes(
-                    $"Content-Disposition: form-data; name=\"data_file\"; filename=\"{filename}\"{Environment.NewLine}");
-                requestStream.Write(buffer, 0, buffer.Length);
-                buffer = Encoding.ASCII.GetBytes(
-                    $"Content-Type: application/octet-stream{Environment.NewLine}{Environment.NewLine}");
-                requestStream.Write(buffer, 0, buffer.Length);
-                
-                
                 fileStream.CopyTo(requestStream);
-                buffer = Encoding.ASCII.GetBytes(Environment.NewLine);
-                requestStream.Write(buffer, 0, buffer.Length);
 
-                buffer = Encoding.ASCII.GetBytes(boundary + "--");
-                requestStream.Write(buffer, 0, buffer.Length);
+                WriteStringToStream("\r\n" + boundary + "--", requestStream);
             }
             try
             {
