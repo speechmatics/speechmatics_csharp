@@ -101,8 +101,6 @@ namespace Speechmatics.API
 
             using (var requestStream = request.GetRequestStream())
             {
-                byte[] buffer;
-
                 var formParameters = new Dictionary<string, string>
                 {
                     ["model"] = lang
