@@ -51,7 +51,7 @@ namespace Speechmatics.API
             var uploadUri = CreateUserRelativeUri("/jobs/");
             using (var fileStream = new FileStream(audioFilename, FileMode.Open))
             {
-                var jsonResponse = FileUpload.UploadFileForTranscription(uploadUri, Path.GetFileName(audioFilename), fileStream, lang, new NameValueCollection(), diarize);
+                var jsonResponse = FileUpload.UploadFileForTranscription(uploadUri, Path.GetFileName(audioFilename), fileStream, lang, diarize);
                 if (jsonResponse != null)
                 {
                     dynamic jobJson = JsonConvert.DeserializeObject(jsonResponse);
@@ -75,7 +75,7 @@ namespace Speechmatics.API
             {
                 using (var textFileStream = new FileStream(textFilename, FileMode.Open))
                 {
-                    var jsonResponse = FileUpload.UploadFilesForAlignment(uploadUri, Path.GetFileName(audioFilename), fileStream, Path.GetFileName(textFilename), textFileStream, lang, new NameValueCollection());
+                    var jsonResponse = FileUpload.UploadFilesForAlignment(uploadUri, Path.GetFileName(audioFilename), fileStream, Path.GetFileName(textFilename), textFileStream, lang);
                     if (jsonResponse != null)
                     {
                         dynamic jobJson = JsonConvert.DeserializeObject(jsonResponse);
