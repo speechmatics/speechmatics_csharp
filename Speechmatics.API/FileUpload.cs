@@ -120,8 +120,7 @@ namespace Speechmatics.API
 
                 fileStream.CopyTo(requestStream);
 
-                WriteStringToStream("\r\n" + boundary + "--", requestStream);
-
+                WriteStringToStream("\r\n", requestStream);
                 WriteStringToStream(boundary, requestStream);
                 WriteStringToStream($"Content-Disposition: form-data; name=\"text_file\"; filename=\"{textFilename}\"", requestStream);
                 WriteStringToStream("Content-Type: application/octet-stream\r\n", requestStream);
