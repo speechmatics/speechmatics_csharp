@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Speechmatics.API
+﻿namespace Speechmatics.API
 {
     /// <summary>
     /// Response from uploading a new audio file to the API for transcription
@@ -19,15 +14,16 @@ namespace Speechmatics.API
         public CreateJobResponse(int jobId, int cost, int balance)
         {
             Job = new Job(jobId, cost);
+            Balance = balance;
         }
 
         /// <summary>
         /// The new job created by this action
         /// </summary>
-        public Job Job { get; private set; }
+        public Job Job { get; }
         /// <summary>
         /// User's remaining balance (in pence)
         /// </summary>
-        public int Balance { get; private set; }
+        public int Balance { get; }
     }
 }

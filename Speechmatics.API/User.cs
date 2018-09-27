@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Speechmatics.API
+﻿namespace Speechmatics.API
 {
     /// <summary>
     /// Class representing a user of the speechmatics API
@@ -16,7 +11,7 @@ namespace Speechmatics.API
         /// <param name="id">Unique user Id</param>
         /// <param name="email">User's email address</param>
         /// <param name="balance">User's remaining balance (in pence)</param>
-        public User(int id, String email, int balance)
+        public User(int id, string email, int balance)
         {
             Id = id;
             Email = email;
@@ -26,14 +21,14 @@ namespace Speechmatics.API
         /// <summary>
         /// Unique user Id
         /// </summary>
-        public int Id { get; private set; }
+        public int Id { get; }
         /// <summary>
         /// User's email address
         /// </summary>
-        public string Email { get; private set; }
+        public string Email { get; }
         /// <summary>
         /// User's remaining balance (in pence)
         /// </summary>
-        public int Balance { get; private set;}
+        public int Balance { get; }
     }
 }
