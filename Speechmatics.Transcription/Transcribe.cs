@@ -1,216 +1,208 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using System.IO;
 using Speechmatics.API;
 
 namespace Speechmatics.Transcription
 {
     public partial class Transcribe : Form
     {
+        private SpeechmaticsClient _smClient;
+        private readonly List<Job> _jobs;
+        private readonly List<string> _files;
+
         public Transcribe()
         {
             InitializeComponent();
-            sc = null;
             gbJob.Enabled = false;
+            _files = new List<string>();
+            _jobs = new List<Job>();
         }
 
         private void btnUploadFile_MouseClick(object sender, MouseEventArgs e)
         {
             ofdUploadFile.Title = "Select audio file to be transcribed";
-            DialogResult dr = ofdUploadFile.ShowDialog();
-            if (dr == DialogResult.OK)
+            var dr = ofdUploadFile.ShowDialog();
+            if (dr != DialogResult.OK) return;
+
+            Cursor = Cursors.WaitCursor;
+            try
             {
-                this.Cursor = Cursors.WaitCursor;
-                try
-                {
-                    files = new string[1];
-                    jobs = new Job[1];
-                    outputs = new string[1];
-                    files[0] = Path.GetFullPath(ofdUploadFile.FileName);
-                    lblJobName.Text = files[0];
-                    startJobs();
-                }
-                finally
-                {
-                    this.Cursor = Cursors.Default;
-                }
+                var file = Path.GetFullPath(ofdUploadFile.FileName);
+                _files.Add(file);
+                lblJobName.Text = file;
+                StartJobs();
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
             }
         }
 
         private void btnUploadDirectory_MouseClick(object sender, MouseEventArgs e)
         {
-            DialogResult dr = fbdUploadDir.ShowDialog();
-            if (dr == DialogResult.OK)
-            {
-                this.Cursor = Cursors.WaitCursor;
-                try
-                {
-                    files = Directory.GetFiles(fbdUploadDir.SelectedPath);
-                    jobs = new Job[files.Length];
-                    outputs = new string[files.Length];
-                    lblDirName.Text = fbdUploadDir.SelectedPath;
-                    startJobs();
-                }
-                finally
-                {
-                    this.Cursor = Cursors.Default;
-                }
-            }
+            var dr = fbdUploadDir.ShowDialog();
+            if (dr != DialogResult.OK) return;
 
+            Cursor = Cursors.WaitCursor;
+            try
+            {
+                _files.AddRange(Directory.GetFiles(fbdUploadDir.SelectedPath));
+                lblDirName.Text = fbdUploadDir.SelectedPath;
+                StartJobs();
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
+            }
         }
 
-        private void startJobs(){           
+        private void StartJobs()
+        {
             langComboBox.Enabled = false;
             tabType.Enabled = false;
             gbUser.Enabled = false;
-            cbxDiarise.Enabled = false;
+            cbxDiarize.Enabled = false;
             rtbTranscript.Text = "Your job(s) are currently being transcribed.\r\nPlease wait - when finished your transcription(s) will automatically be displayed here.\n";
             lblJobStatus.Text = "Job status: in progress.";
-            lblJobStatus.ForeColor = System.Drawing.Color.Teal;
-            for(int i=0; i < files.Length ; i++)
-            {
-                CreateJobResponse resp = sc.CreateTranscriptionJob(files[i], langComboBox.Text, cbxDiarise.Checked);
+            lblJobStatus.ForeColor = Color.Teal;
+
+            foreach(var file in _files)
+            { 
+                var resp = _smClient.CreateTranscriptionJob(file, langComboBox.Text, cbxDiarize.Checked);
                 if (resp != null)
-                {                       
-                    jobs[i] = resp.Job;                       
+                {
+                    _jobs.Add(resp.Job);
                 }
                 else
                 {
-                    jobs[i] = new Job(0, 0);
-                    jobs[i].Status = "done";
-                    jobs[i].Name = files[i];
-                    rtbTranscript.Text += "Error uploading file " + files[i] + "\n";
-                    outputs[i] = "Error uploading file " + files[i] + "\n";
+                    _jobs.Add(new Job(0, 0)
+                    {
+                        Status = "done",
+                        Name = file
+                    });
+                    rtbTranscript.Text += $"Error uploading file ${file}\n";
                 }
             }
-            checkCurrentJobs();
+            CheckCurrentJobs();
             tmrStatus.Interval = 10000;
             tmrStatus.Enabled = true;
         }
 
-        private SpeechmaticsClient sc;
-        private Job[] jobs;
-        private string[] outputs;       
-        private string[] files;
-        
-        private void refreshClientCredentials()
+        private void InvalidCredentials(string reason)
         {
-            if (!string.IsNullOrEmpty(tbUserId.Text) && !string.IsNullOrEmpty(tbAuthToken.Text))
-            {
-                int userId = -1;
-                if (Int32.TryParse(tbUserId.Text, out userId))
-                {
-                    sc = new SpeechmaticsClient(userId, tbAuthToken.Text);
-                    connectStatusLabel.Text = "Connection status: Not Connected";
-                    this.connectStatusLabel.ForeColor = System.Drawing.Color.DarkOrange;
-                    gbJob.Enabled = false;  
-                    User user = null;
-                    this.Cursor = Cursors.WaitCursor;
-                    try
-                    {
-                        user = sc.GetUser();
-                        if (user != null)
-                        {
-                            gbJob.Enabled = true;
-                        }
-                    }
-                    finally
-                    {
-                        this.Cursor = Cursors.Default;
-                    }
-                    if (null == user)
-                    {
-                        connectStatusLabel.Text = "Connection status: Invalid Auth Token";
-                        lblBalanceValue.Text = "Not Connected";
-                        lblEmailValue.Text = "Not Connected";
-                        gbJob.Enabled = false;
-                    }
-                    else
-                    {
-                        connectStatusLabel.Text = "Connection status: Connected";
-                        lblBalanceValue.Text = formatBalance(user.Balance);
-                        lblEmailValue.Text = user.Email;
-                        connectStatusLabel.ForeColor = System.Drawing.Color.Green;
-                    }
-                }
-                else
-                {
-                    connectStatusLabel.Text = "Connection status: Invalid User ID";
-                    lblBalanceValue.Text = "Not Connected";
-                    lblEmailValue.Text = "Not Connected";
-                    gbJob.Enabled = false;
-                }
-            }
+            connectStatusLabel.Text = reason;
+            lblBalanceValue.Text = "Not Connected";
+            lblEmailValue.Text = "Not Connected";
+            gbJob.Enabled = false;
         }
 
-        private void checkCurrentJobs()
+        private void RefreshClientCredentials()
         {
-            rtbTranscript.Text = "";
-            int completeCount = 0;
-            for (int i = 0; i < jobs.Length; i++)
-            {               
-                if (jobs[i].Status != "done")
-                { 
-                    sc.UpdateJobStatus(jobs[i]);
-                    if (jobs[i].Status == "done")
+            if (string.IsNullOrEmpty(tbUserId.Text) ||
+                string.IsNullOrEmpty(tbAuthToken.Text) ||
+                !int.TryParse(tbUserId.Text, out var userId))
+            {
+                InvalidCredentials("Connection status: Invalid User ID");
+                return;
+            }
+
+            _smClient = new SpeechmaticsClient(userId, tbAuthToken.Text);
+            connectStatusLabel.Text = "Connection status: Not Connected";
+            connectStatusLabel.ForeColor = Color.DarkOrange;
+            gbJob.Enabled = false;
+            User user;
+            Cursor = Cursors.WaitCursor;
+            try
+            {
+                user = _smClient.GetUser();
+                if (user != null)
+                {
+                    gbJob.Enabled = true;
+                }
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
+            }
+            if (null == user)
+            {
+                InvalidCredentials("Connection status: Invalid Auth Token");
+                return;
+            }
+            connectStatusLabel.Text = "Connection status: Connected";
+            lblBalanceValue.Text = FormatBalance(user.Balance);
+            lblEmailValue.Text = user.Email;
+            connectStatusLabel.ForeColor = Color.Green;
+        }
+
+        private void CheckCurrentJobs()
+        {
+            var outputText = new StringBuilder();
+
+            foreach (var job in _jobs)
+            {
+                if (job.Status != "done")
+                {
+                    _smClient.UpdateJobStatus(job);
+                }
+
+                outputText.AppendLine($"Job {job.Name} status {job.Status}");
+
+                if (job.Status == "done")
+                {
+                    outputText.AppendLine("Output:");
+                    outputText.AppendLine(_smClient.GetTranscript(job, "txt"));
+
+                    using (var sw = new StreamWriter(Path.ChangeExtension(job.Name, ".json")))
                     {
-                        outputs[i] = sc.getTranscript(jobs[i], "txt");
-                        System.IO.StreamWriter sw = new System.IO.StreamWriter(Path.ChangeExtension(files[i], ".txt"));
-                        sw.Write(outputs[i]);
-                        sw.Close();
-                        sw = new System.IO.StreamWriter(Path.ChangeExtension(files[i], ".json"));
-                        sw.Write(sc.getTranscript(jobs[i], "json"));
-                        sw.Close();
+                        sw.Write(_smClient.GetTranscript(job, "json"));
+                    }
+                    using (var sw = new StreamWriter(Path.ChangeExtension(job.Name, ".txt")))
+                    {
+                        sw.Write(_smClient.GetTranscript(job, "txt"));
                     }
                 }
-                
-                rtbTranscript.Text += "Job " + jobs[i].Name + " status " + jobs[i].Status;
-                if (jobs[i].Status == "done")
-                {
-                    completeCount++;
-                    rtbTranscript.Text += "\nOutput:\n";
-                    rtbTranscript.Text += outputs[i];
-                }
-                rtbTranscript.Text += "\n---\n";
-             }
-            if (completeCount == jobs.Length)
+
+                outputText.AppendLine("---");
+            }
+
+            if (_jobs.All(job => job.Status == "done"))
             {
-                unlockClient();
+                UnlockClient();
                 lblJobStatus.Text = "Job status: All jobs complete.";
-                lblJobStatus.ForeColor = System.Drawing.Color.Green;
+                lblJobStatus.ForeColor = Color.Green;
             }
 
+            rtbTranscript.Text = outputText.ToString();
         }
 
-        private void unlockClient()
+        private void UnlockClient()
         {
-            tmrStatus.Enabled = false; 
+            tmrStatus.Enabled = false;
             langComboBox.Enabled = true;
             tabType.Enabled = true;
             gbUser.Enabled = true;
-            cbxDiarise.Enabled = true;
+            cbxDiarize.Enabled = true;
         }
 
-        private string formatBalance(int balance)
+        private static string FormatBalance(int balance)
         {
-            return string.Format("{0} credits", balance);
+            return $"{balance} credits";
         }
-
 
         private void tmrStatus_Tick(object sender, EventArgs e)
         {
-            checkCurrentJobs();
+            CheckCurrentJobs();
         }
 
         private void btnConnect_Click(object sender, EventArgs e)
         {
-            refreshClientCredentials();
+            RefreshClientCredentials();
         }
     }
 }

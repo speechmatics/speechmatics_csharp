@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Speechmatics.API
+﻿namespace Speechmatics.API
 {
     /// <summary>
     /// Class describing a single transcription job uniquely identified by Id
@@ -23,11 +18,11 @@ namespace Speechmatics.API
         /// <summary>
         /// Unique job Id
         /// </summary>
-        public int Id { get; private set; }
+        public int Id { get; }
         /// <summary>
         /// Cost (in pence) for the transcription of this job
         /// </summary>
-        public int Cost { get; private set; }
+        public int Cost { get; }
         /// <summary>
         /// Name of original Audio File that is being transcribed in this job
         /// </summary>

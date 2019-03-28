@@ -60,7 +60,7 @@
             this.lblJobStatus = new System.Windows.Forms.Label();
             this.langComboBox = new System.Windows.Forms.ComboBox();
             this.langLabel = new System.Windows.Forms.Label();
-            this.cbxDiarise = new System.Windows.Forms.CheckBox();
+            this.cbxDiarize = new System.Windows.Forms.CheckBox();
             this.gbUser.SuspendLayout();
             this.gbJob.SuspendLayout();
             this.tabType.SuspendLayout();
@@ -237,12 +237,12 @@
             this.loginLabel.Name = "loginLabel";
             this.loginLabel.Size = new System.Drawing.Size(447, 13);
             this.loginLabel.TabIndex = 17;
-            this.loginLabel.Text = "Login to https://www.speechmatics.com/account to find your \'User ID\' and \'API Aut" +
+            this.loginLabel.Text = "Login to https://app.speechmatics.com/account/ to find your \'User ID\' and \'API Aut" +
     "h Token\'";
             // 
             // gbJob
             // 
-            this.gbJob.Controls.Add(this.cbxDiarise);
+            this.gbJob.Controls.Add(this.cbxDiarize);
             this.gbJob.Controls.Add(this.tabType);
             this.gbJob.Controls.Add(this.lblJobStatus);
             this.gbJob.Controls.Add(this.langComboBox);
@@ -352,17 +352,17 @@
             this.langLabel.TabIndex = 19;
             this.langLabel.Text = "Language:";
             // 
-            // cbxDiarise
+            // cbxDiarize
             // 
-            this.cbxDiarise.AutoSize = true;
-            this.cbxDiarise.Checked = true;
-            this.cbxDiarise.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbxDiarise.Location = new System.Drawing.Point(394, 111);
-            this.cbxDiarise.Name = "cbxDiarise";
-            this.cbxDiarise.Size = new System.Drawing.Size(96, 17);
-            this.cbxDiarise.TabIndex = 20;
-            this.cbxDiarise.Text = "track speakers";
-            this.cbxDiarise.UseVisualStyleBackColor = true;
+            this.cbxDiarize.AutoSize = true;
+            this.cbxDiarize.Checked = true;
+            this.cbxDiarize.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbxDiarize.Location = new System.Drawing.Point(394, 111);
+            this.cbxDiarize.Name = "cbxDiarize";
+            this.cbxDiarize.Size = new System.Drawing.Size(96, 17);
+            this.cbxDiarize.TabIndex = 20;
+            this.cbxDiarize.Text = "track speakers";
+            this.cbxDiarize.UseVisualStyleBackColor = true;
             // 
             // Transcribe
             // 
@@ -420,7 +420,7 @@
         private System.Windows.Forms.Button btnUploadDir;
         private System.Windows.Forms.Label lblCurrentDir;
         private System.Windows.Forms.Label lblDirName;
-        private System.Windows.Forms.CheckBox cbxDiarise;
+        private System.Windows.Forms.CheckBox cbxDiarize;
     }
 }
 
